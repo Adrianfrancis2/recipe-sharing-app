@@ -7,10 +7,10 @@ const Record = (props) => (
       {props.record.name}
     </td>
     <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0">
-      {props.record.position}
+      {props.record.username}
     </td>
     <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0">
-      {props.record.level}
+      {props.record.password}
     </td>
     <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0">
       <div className="flex gap-2">
@@ -89,10 +89,10 @@ export default function RecordList() {
                   Name
                 </th>
                 <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">
-                  Position
+                  Username
                 </th>
                 <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">
-                  Level
+                  Password
                 </th>
                 <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">
                   Action
