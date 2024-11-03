@@ -21,6 +21,6 @@ try {
   console.error(err);
 }
 
-let db = client.db("recipes");
+let db = client.db("recipe-sharing");
 
 export default db;
