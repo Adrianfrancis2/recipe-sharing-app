@@ -18,9 +18,9 @@ router.get("/", async (req, res) =>  {
 
 //  Get a single record by id
 router.get("/:id", async (req, res) => {
-  let collection = await db.collection("records");
+  let collection = await db.collection("users");
   let query = { _id: new ObjectId(req.params.id) };
-  let result = await collection.findOne(query);
+  let result = await collection.findOneAndUpdate(query);
 
   if (!result) res.status(404).send("Not found");
   else res.status(200).send(result);
@@ -30,10 +30,8 @@ router.get("/:id", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     let newUser = {
-      name: {
-        first: req.body.firstName,
-        last: req.body.lastName,
-      },
+      name: req.body.name,
+      username: req.body.username,
       password: req.body.password,
       recipe_ids: [],
       views: 0,
@@ -53,10 +51,8 @@ router.patch("/:id", async (req, res) => {
     const query = { _id: new ObjectId(req.params.id) };
     const updates = {
       $set: {
-        name: {
-          first: req.body.firstName,
-          last: req.body.lastName,
-        },
+        name: req.body.name,
+        username: req.body.username,
         password: req.body.password,
         recipe_ids: req.body.recipe_ids,
         views: req.body.views,
