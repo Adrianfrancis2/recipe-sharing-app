@@ -11,7 +11,7 @@ const router = express.Router();
 
 //  Get a list of all users
 router.get("/", async (req, res) =>  {
-  let collection = await db.collection("users");
+  let collection = await db.collection("recipes");
   let results = await collection.find({}).toArray();
   res.status(200).send(results);
 });
@@ -29,21 +29,18 @@ router.get("/:id", async (req, res) => {
 //  Create a new user
 router.post("/", async (req, res) => {
   try {
-    let newUser = {
-      name: {
-        first: req.body.firstName,
-        last: req.body.lastName,
-      },
-      password: req.body.password,
-      recipe_ids: [],
-      views: 0,
+    let newRecipe = {
+      title: req.body.title,
+      desc: req.body.desc,
+      ingredients: req.body.ingredients,
+      steps: req.body.steps,
     };
-    let collection = await db.collection("users");
-    let result = await collection.insertOne(newUser);
+    let collection = await db.collection("recipes");
+    let result = await collection.insertOne(newRecipe);
     res.status(204).send(result);
   } catch (err) {
     console.error(err);
-    res.status(500).send("Error adding user");
+    res.status(500).send("Error adding recipe");
   }
 });
 
@@ -53,22 +50,19 @@ router.patch("/:id", async (req, res) => {
     const query = { _id: new ObjectId(req.params.id) };
     const updates = {
       $set: {
-        name: {
-          first: req.body.firstName,
-          last: req.body.lastName,
-        },
-        password: req.body.password,
-        recipe_ids: req.body.recipe_ids,
-        views: req.body.views,
+        title: req.body.title,
+        desc: req.body.desc,
+        ingredients: req.body.ingredients,
+        steps: req.body.steps,
       },
     };
 
-    let collection = await db.collection("users");
+    let collection = await db.collection("recipes");
     let result = await collection.updateOne(query, updates);
     res.status(200).send(result);
   } catch (err) {
     console.error(err);
-    res.status(500).send("Error updating user");
+    res.status(500).send("Error updating recipe");
   }
 });
 
@@ -76,13 +70,13 @@ router.patch("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   try {
     const query = { _id: new ObjectId(req.params.id) };
-    const collection = db.collection("users");
+    const collection = db.collection("recipes");
     let result = await collection.deleteOne(query);
 
     res.status(200).send(result);
   } catch(err) {
     console.error(err);
-    res.status(500).send("Error deleting user");
+    res.status(500).send("Error deleting recipe");
   }
 });
 
