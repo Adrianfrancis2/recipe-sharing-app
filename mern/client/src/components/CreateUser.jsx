@@ -59,7 +59,13 @@ export default function CreateUser() {
         return;
     }
 
-    const person = { ...form };
+    const person = { 
+      name: form.name,
+      username: form.username,
+      password: form.password,
+      recipe_ids: [],
+      views: 0,
+    };
     try {
       let response;
       if (isNew) {

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { PropTypes } from "prop-types";
 
 const User = (props) => (
   <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
@@ -34,6 +35,15 @@ const User = (props) => (
     </td>
   </tr>
 );
+User.propTypes = {
+  user: PropTypes.shape({
+    name: PropTypes.string,
+    username: PropTypes.string,
+    password: PropTypes.string,
+    _id: PropTypes.string,
+  }),
+  deleteUser: PropTypes.func,
+};
 
 export default function UserList() {
   const [users, setUsers] = useState([]);
