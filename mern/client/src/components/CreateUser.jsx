@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function CreateUser() {
@@ -8,7 +8,7 @@ export default function CreateUser() {
     password: "",
     confirm_password: "",
   });
-  const [isNew, setIsNew] = useState(true);
+
   const navigate = useNavigate();
 
   // useEffect(() => {
@@ -72,34 +72,24 @@ export default function CreateUser() {
     };
     try {
       let response;
-      if (isNew) {
-        // if we are adding a new user we will POST to /user.
-        response = await fetch("http://localhost:5050/user", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(person),
-        });
-      } else {
-        // if we are updating a user we will PATCH to /user/:id.
-        response = await fetch(`http://localhost:5050/user/${params.id}`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(person),
-        });
-      }
 
-      if (!response.ok) {
+      response = await fetch("http://localhost:5050/user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(person),
+      });
+
+      if (response.status == 400) {
+        alert("Username already exists");
+      } else if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-    } catch (error) {
-      console.error('A problem occurred with your fetch operation: ', error);
-    } finally {
       setForm({ name: "", username: "", password: "", confirm_password: "" });
       navigate("/");
+    } catch (error) {
+      console.error('A problem occurred with your fetch operation: ', error);
     }
   }
 
