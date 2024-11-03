@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function CreateUser() {
   const [form, setForm] = useState({
@@ -9,33 +9,32 @@ export default function CreateUser() {
     confirm_password: "",
   });
   const [isNew, setIsNew] = useState(true);
-  const params = useParams();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    async function fetchData() {
-      const id = params.id?.toString() || undefined;
-      if(!id) return;
-      setIsNew(false);
-      const response = await fetch(
-        `http://localhost:5050/user/${params.id.toString()}`
-      );
-      if (!response.ok) {
-        const message = `An error has occurred: ${response.statusText}`;
-        console.error(message);
-        return;
-      }
-      const user = await response.json();
-      if (!user) {
-        console.warn(`Record with id ${id} not found`);
-        navigate("/");
-        return;
-      }
-      setForm(user);
-    }
-    fetchData();
-    return;
-  }, [params.id, navigate]);
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     const id = params.id?.toString() || undefined;
+  //     if(!id) return;
+  //     setIsNew(false);
+  //     const response = await fetch(
+  //       `http://localhost:5050/user/${params.id.toString()}`
+  //     );
+  //     if (!response.ok) {
+  //       const message = `An error has occurred: ${response.statusText}`;
+  //       console.error(message);
+  //       return;
+  //     }
+  //     const user = await response.json();
+  //     if (!user) {
+  //       console.warn(`Record with id ${id} not found`);
+  //       navigate("/");
+  //       return;
+  //     }
+  //     setForm(user);
+  //   }
+  //   fetchData();
+  //   return;
+  // }, [params.id, navigate]);
 
   // These methods will update the state properties.
   function updateForm(value) {
@@ -47,6 +46,11 @@ export default function CreateUser() {
   // This function will handle the submission.
   async function onSubmit(e) {
     e.preventDefault();
+
+    if (!form.name || !form.username || !form.password) {
+      alert("Please fill out all fields");
+      return;
+    }
 
     // regex pattern for password validation
     const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/; 
