@@ -16,18 +16,27 @@ router.get("/", async (req, res) =>  {
   res.status(200).send(results);
 });
 
-//  Get a single record by id
-router.get("/:id", async (req, res) => {
-  let collection = await db.collection("users");
-  let query = { _id: new ObjectId(req.params.id) };
-  let result = await collection.findOneAndUpdate(query);
-
-  if (!result) res.status(404).send("Not found");
-  else res.status(200).send(result);
-});
+// //  Fetch user login
+// router.post("/", async (req, res) => {
+//   try {
+//     let loginUser = {
+//       username: req.body.username,
+//       password: req.body.password,
+//     };
+//     let collection = await db.collection("users");
+//     let findUserName = await collection.findOne({ username: newUser.username });
+//     console.log(findUserName);
+//     result = findUserName;
+//     res.status(204).send(result);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).send({ message: "Error fetching user: no user found" });
+//   };
+// });
 
 //  Create a new user
 router.post("/", async (req, res) => {
+  console.log("post request to /user routed")
   try {
     let newUser = {
       name: req.body.name,
@@ -38,7 +47,7 @@ router.post("/", async (req, res) => {
     };
     let collection = await db.collection("users");
     let findUserName = await collection.findOne({ username: newUser.username });
-    if (findUserName.length == 0) {
+    if (findUserName == null) {
       let result = await collection.insertOne(newUser);
       res.status(204).send(result);
     } else {

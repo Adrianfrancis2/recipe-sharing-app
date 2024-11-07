@@ -72,8 +72,7 @@ export default function CreateUser() {
     };
     try {
       let response;
-
-      response = await fetch("http://localhost:5050/user", {
+      response = await fetch("http://localhost:5050/newuser", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -168,11 +167,14 @@ export default function CreateUser() {
                     name="password"
                     id="password"
                     className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-slate-900 placeholder:text-slate-400 focus:ring-0 sm:text-sm sm:leading-6"
-                    placeholder="Password must contain at least 8 characters, and at least one letter and number"
+                    placeholder="Enter password"
                     value={form.password}
                     onChange={(e) => updateForm({ password: e.target.value })}
                   />
                 </div>
+              </div>
+              <div className="text-sm">
+              Password must contain at least 8 characters, and at least one letter and one number.
               </div>
             </div>
             <div className="sm:col-span-4">

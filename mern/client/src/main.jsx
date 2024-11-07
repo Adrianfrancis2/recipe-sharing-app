@@ -5,7 +5,8 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import App from "./App";
-import User from "./components/CreateUser";
+import NewUser from "./components/CreateUser";
+import Login from "./components/LoginUser"
 import UserList from "./components/UserList";
 import "./index.css";
 
@@ -26,20 +27,30 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/edit/:id",
-        element: <User />,
+        element: <NewUser />,
       },
     ],
   },
   {
-    path: "/create",
+    path: "/newuser",
     element: <App />,
     children: [
       {
-        path: "/create",
-        element: <User />,
+        path: "/newuser",
+        element: <NewUser />,
       },
     ],
   },
+  {
+    path: "/login",
+    element: <App />,
+    children: [
+      {
+        path: "/login",
+        element: <Login />,
+      }
+    ]
+  }
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
