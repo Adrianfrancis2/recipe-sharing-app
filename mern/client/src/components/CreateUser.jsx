@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function CreateUser() {
+  const [messageData, setMessageData] = useState("");
+
   const [form, setForm] = useState({
     name: "",
     username: "",
@@ -10,31 +12,6 @@ export default function CreateUser() {
   });
 
   const navigate = useNavigate();
-
-  // useEffect(() => {
-  //   async function fetchData() {
-  //     const id = params.id?.toString() || undefined;
-  //     if(!id) return;
-  //     setIsNew(false);
-  //     const response = await fetch(
-  //       `http://localhost:5050/user/${params.id.toString()}`
-  //     );
-  //     if (!response.ok) {
-  //       const message = `An error has occurred: ${response.statusText}`;
-  //       console.error(message);
-  //       return;
-  //     }
-  //     const user = await response.json();
-  //     if (!user) {
-  //       console.warn(`Record with id ${id} not found`);
-  //       navigate("/");
-  //       return;
-  //     }
-  //     setForm(user);
-  //   }
-  //   fetchData();
-  //   return;
-  // }, [params.id, navigate]);
 
   // These methods will update the state properties.
   function updateForm(value) {
@@ -47,21 +24,13 @@ export default function CreateUser() {
   async function onSubmit(e) {
     e.preventDefault();
 
-    if (!form.name || !form.username || !form.password) {
-      alert("Please fill out all fields");
+    if (!form.name || !form.username || !form.password || !form.confirm_password) {
+      setMessageData("form empty");
       return;
     }
 
     // regex pattern for password validation
     const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/; 
-    // check if passwords match before proceeding
-    if (form.password !== form.confirm_password) {
-        alert("Passwords do not match");
-        return;
-    } else if (!passwordPattern.test(form.password)) {
-        alert("Password must contain at least 8 characters and contain at least one letter and one number");
-        return;
-    }
 
     const person = { 
       name: form.name,
@@ -81,12 +50,22 @@ export default function CreateUser() {
       });
 
       if (response.status == 400) {
-        alert("Username already exists");
+        setMessageData("username exists");
       } else if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
+      } else {
+        // check if passwords match before creating account
+        if (!passwordPattern.test(form.password)) {
+          setMessageData("password not complex");
+          return;
+        } else if (form.password !== form.confirm_password) {
+          setMessageData("passwords do not match");
+          return;
+        }
+        setMessageData("account created");
+        setForm({ name: "", username: "", password: "", confirm_password: "" });
+        navigate("/");
       }
-      setForm({ name: "", username: "", password: "", confirm_password: "" });
-      navigate("/");
     } catch (error) {
       console.error('A problem occurred with your fetch operation: ', error);
     }
@@ -152,6 +131,7 @@ export default function CreateUser() {
                   />
                 </div>
               </div>
+              {messageData == "username exists" ? <div className="text-sm text-red-600">Username already exists.</div> : ""}
             </div>
             <div className="sm:col-span-4">
               <label
@@ -176,6 +156,7 @@ export default function CreateUser() {
               <div className="text-sm">
               Password must contain at least 8 characters, and at least one letter and one number.
               </div>
+              {messageData == "password not complex" ? <div className="text-sm text-red-600">Password does not meet complexity requirements.</div> : ""}
             </div>
             <div className="sm:col-span-4">
               <label
@@ -197,6 +178,7 @@ export default function CreateUser() {
                   />
                 </div>
               </div>
+              {messageData == "passwords do not match" ? <div className="text-sm text-red-600">Passwords do not match.</div> : ""}
             </div>
           </div>
         </div>

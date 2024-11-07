@@ -24,13 +24,13 @@ router.post("/", async (req, res) => {
       console.log(findUserName);
 
       if (findUserName == null) {
-        console.error("No user found.");
-        res.status(400).json({ msg: "No user found." });
+        console.error("user not found");
+        res.status(400).json({ msg: "user not found" });
       } else if (findUserName.password != loginUser.password) {
-        console.error("Password is incorrect.");
-        res.status(400).json({ msg: "Password is incorrect." });
+        console.error("incorrect password");
+        res.status(400).json({ msg: "incorrect password" });
       } else {
-        res.status(200).json({ msg: `Welcome back, ${findUserName.name}` });
+        res.status(200).json({ msg: findUserName });
       }
     } catch (err) {
         console.log("oopsies");

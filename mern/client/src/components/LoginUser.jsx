@@ -1,55 +1,70 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function LoginUser() {
-    const [form, setForm] = useState({
-        username: "",
-        password: "",
-    });
+export default function LoginUser({isLoggedIn, setLogin}) {
+  const [messageData, setMessageData] = useState("");
 
-    const navigate = useNavigate();
+  const [form, setForm] = useState({
+      username: "",
+      password: "",
+  });
 
-    function updateForm(value) {
-        return setForm((prev) => {
-          return { ...prev, ...value };
-        });
+  const navigate = useNavigate();
+
+  function updateForm(value) {
+      return setForm((prev) => {
+        return { ...prev, ...value };
+      });
+  }
+
+  // TODO: redirect to user profile page if user is logged in
+  if (isLoggedIn) {
+    navigate("/user/:id");
+  } 
+
+  async function onSubmit(e) {
+    e.preventDefault();
+    setMessageData("");
+
+    if (!form.username || !form.password) {
+      setMessageData("form empty");
+      return;
     }
 
-    async function onSubmit(e) {
-        e.preventDefault();
-    
-        const person = { 
-          username: form.username,
-          password: form.password,
-        };
+    const person = { 
+      username: form.username,
+      password: form.password,
+    };
 
-        console.log(person.username);
-        console.log(person.password);
-        try {
-          let response;
-          response = await fetch("http://localhost:5050/login", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(person),
-          });
+    try {
+      let response;
+      response = await fetch("http://localhost:5050/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(person),
+      });
 
-          let response_data = await response.json();
+      let response_data = await response.json();
 
-          if (!response.ok) {
-            alert(`Login unsuccessful: ${response_data.msg}`);
-            throw new Error(`HTTP error! status: ${response_data.msg}`);
-          } else {
-            alert(`Login successful: ${response_data.msg}`)
-            setForm({ username: "", password: "" });
-            navigate("/");
-          }
-
-        } catch (error) {
-          console.error('A problem occurred with your fetch operation: ', error);
-        }
+      if (!response.ok) {
+        setMessageData(response_data.msg);
+        console.log(messageData);
+        throw new Error(`HTTP error! status: ${response_data.msg}`);
+      } else {
+        setMessageData(response_data.msg.name);
+        setLogin(true);
+        setForm({ username: "", password: "" });
+        navigate("/");
+        return;
       }
+
+    } catch (error) {
+      console.error('A problem occurred with your fetch operation: ', error);
+    }
+
+  }
 
   // This following section will display the form that takes the input from the user.
   return (
@@ -90,6 +105,7 @@ export default function LoginUser() {
                   />
                 </div>
               </div>
+              {messageData == "user not found" ? <div className="text-sm text-red-600">Username not found.</div> : ""}
             </div>
             <div className="sm:col-span-4">
               <label
@@ -111,6 +127,7 @@ export default function LoginUser() {
                   />
                 </div>
               </div>
+              {messageData == "incorrect password" ? <div className="text-sm text-red-600">Password is Incorrect.</div> : ""}
             </div>
             
           </div>
@@ -120,6 +137,7 @@ export default function LoginUser() {
           value="Login"
           className="inline-flex items-center justify-center whitespace-nowrap text-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-slate-100 hover:text-accent-foreground h-9 rounded-md px-3 cursor-pointer mt-4"
         />
+        {messageData == "form empty" ? <div className="text-sm text-red-600">Please fill out all fields.</div> : ""}
       </form>
     </>
   );

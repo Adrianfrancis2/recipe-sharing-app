@@ -6,9 +6,10 @@ import {
 } from "react-router-dom";
 import App from "./App";
 import NewUser from "./components/CreateUser";
-import Login from "./components/LoginUser"
+import LoginUser from "./components/LoginUser"
 import UserList from "./components/UserList";
 import "./index.css";
+import { useState } from "react";
 
 const router = createBrowserRouter([
   {
@@ -47,11 +48,12 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/login",
-        element: <Login />,
+        element: <LoginUser />,
       }
     ]
-  }
+  },
 ]);
+
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
