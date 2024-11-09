@@ -5,11 +5,10 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import App from "./App";
-import NewUser from "./components/CreateUser";
-import LoginUser from "./components/LoginUser"
-import UserList from "./components/UserList";
+import User from "./components/CreateUser";
+import Recipe from "./components/CreateRecipe";
+//  import UserList from "./components/UserList";
 import "./index.css";
-import { useState } from "react";
 
 const router = createBrowserRouter([
   {
@@ -28,32 +27,31 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/edit/:id",
-        element: <NewUser />,
+        element: <User />,
       },
     ],
   },
   {
-    path: "/newuser",
+    path: "/create",
     element: <App />,
     children: [
       {
-        path: "/newuser",
-        element: <NewUser />,
+        path: "/create",
+        element: <User />,
       },
     ],
   },
   {
-    path: "/login",
+    path: "/post",
     element: <App />,
     children: [
       {
-        path: "/login",
-        element: <LoginUser />,
-      }
+        path: "/post",
+        element: <Recipe />,
+      },
     ]
-  },
+  }
 ]);
-
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
