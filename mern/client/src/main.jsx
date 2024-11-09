@@ -5,10 +5,12 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import App from "./App";
-import User from "./components/CreateUser";
-import Recipe from "./components/CreateRecipe";
+import NewUser from "./components/CreateUser";
+//  import Login from "./components/LoginUser";
+//  import Recipe from "./components/CreateRecipe";
 //  import UserList from "./components/UserList";
 import "./index.css";
+import LoginUser from "./components/LoginUser";
 
 //  Lists routes for webpage
 const router = createBrowserRouter([
@@ -28,27 +30,27 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/edit/:id",
-        element: <User />,
+        element: <NewUser />,
       },
     ],
   },
   {
-    path: "/create",
+    path: "/newuser",
     element: <App />,
     children: [
       {
-        path: "/create",
-        element: <User />,
+        path: "/newuser",
+        element: <NewUser />,
       },
     ],
   },
   {
-    path: "/post",
+    path: "/login",
     element: <App />,
     children: [
       {
-        path: "/post",
-        element: <Recipe />,
+        path: "/login",
+        element: <LoginUser />,
       },
     ]
   }
