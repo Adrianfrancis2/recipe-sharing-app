@@ -40,6 +40,17 @@ export default function CreateUser() {
       views: 0,
     };
     try {
+      
+      // check if passwords match before creating account
+      if (!passwordPattern.test(form.password)) {
+        setMessageData("password not complex");
+        return;
+      } else if (form.password !== form.confirm_password) {
+        setMessageData("passwords do not match");
+        return;
+      }
+
+      // Create POST request
       let response;
       response = await fetch("http://localhost:5050/newuser", {
         method: "POST",
@@ -54,18 +65,11 @@ export default function CreateUser() {
       } else if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       } else {
-        // check if passwords match before creating account
-        if (!passwordPattern.test(form.password)) {
-          setMessageData("password not complex");
-          return;
-        } else if (form.password !== form.confirm_password) {
-          setMessageData("passwords do not match");
-          return;
-        }
         setMessageData("account created");
         setForm({ name: "", username: "", password: "", confirm_password: "" });
         navigate("/");
       }
+
     } catch (error) {
       console.error('A problem occurred with your fetch operation: ', error);
     }
