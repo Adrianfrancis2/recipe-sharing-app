@@ -18,9 +18,9 @@ export default function LoginUser({isLoggedIn, setLogin}) {
   }
 
   // TODO: redirect to user profile page if user is logged in
-  if (isLoggedIn) {
-    navigate("/user/:id");
-  } 
+  // if (isLoggedIn) {
+  //   navigate("/user/:id");
+  // } 
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -54,7 +54,7 @@ export default function LoginUser({isLoggedIn, setLogin}) {
         throw new Error(`HTTP error! status: ${response_data.msg}`);
       } else {
         setMessageData(response_data.msg.name);
-        setLogin(true);
+        // setLogin(true);
         setForm({ username: "", password: "" });
         navigate("/");
         return;
