@@ -1,6 +1,7 @@
 import { MongoClient, ServerApiVersion } from "mongodb";
 
-//adding comments
+// adding comments
+// Hi Noosha
 
 const uri = process.env.ATLAS_URI || "";
 const client = new MongoClient(uri, {
