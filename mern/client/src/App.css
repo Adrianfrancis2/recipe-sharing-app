@@ -40,3 +40,16 @@
 .read-the-docs {
   color: #888;
 }
+
+.centered-banner {
+  display: flex;
+  justify-content: center;  /* Horizontally center */
+  align-items: center;      /* Vertically center */
+  height: 100vh;            /* Make the div take full height of the screen */
+  font-size: 6rem;          /* Large text */
+  font-family: 'Dancing Script', cursive;
+  background: linear-gradient(to right, #2b2d8a, #4c6bb8);
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+}

@@ -10,7 +10,7 @@ export default function Navbar({ loggedIn, logout }) {
          {/* Clickable banner that links to the home page */}
         <NavLink to="/">
           <div 
-            className="text-8xl font-bold bg-gradient-to-r from-blue-800 via-indigo-700 to-blue-500 text-transparent bg-clip-text hover:from-blue-900 hover:via-indigo-800 hover:to-blue-600" style={{ fontFamily: 'Dancing Script, cursive' }}>
+            className="text-6xl font-bold bg-gradient-to-r from-blue-800 via-indigo-700 to-blue-500 text-transparent bg-clip-text hover:from-blue-900 hover:via-indigo-800 hover:to-blue-600" style={{ fontFamily: 'Pacifico, cursive'}}>
             cooked.
           </div>
         </NavLink>
