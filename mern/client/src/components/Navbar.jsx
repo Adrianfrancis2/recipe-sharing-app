@@ -3,11 +3,16 @@ import { useOutletContext } from "react-router-dom";
 
 export default function Navbar({ loggedIn, logout }) {
 
+  //banner at top --> link to home page 
   return (
     <div>
-      <nav className="flex gap-3 grid-cols-6 justify-between mb-6">
+      <nav className="flex gap-3 grid-cols-6 justify-between mb-6"> 
+         {/* Clickable banner that links to the home page */}
         <NavLink to="/">
-          <img alt="Sonic breaking it down for you" className="col-span-2 h-100 inline" src="https://media.tenor.com/T_vVVjbxS8sAAAAj/sonic-the-hedgehog-break-dance.gif"></img>
+          <div 
+            className="text-8xl font-bold bg-gradient-to-r from-blue-800 via-indigo-700 to-blue-500 text-transparent bg-clip-text hover:from-blue-900 hover:via-indigo-800 hover:to-blue-600" style={{ fontFamily: 'Dancing Script, cursive' }}>
+            cooked.
+          </div>
         </NavLink>
         {loggedIn ? (LoggedInNavBar(loggedIn, logout)) : (guestNavBar())}
       </nav>
