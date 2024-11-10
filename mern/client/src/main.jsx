@@ -31,12 +31,12 @@ const router = createBrowserRouter([
     
   },
   {
-    path: "/edit/:id",
+    path: "/user/:id",
     element: <App />,
     children: [
       {
-        path: "/edit/:id",
-        element: <NewUser />,
+        path: "/user/:id",
+        // element: <UserProfile />,
       },
     ],
   },
