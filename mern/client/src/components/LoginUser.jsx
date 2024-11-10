@@ -86,7 +86,7 @@ export default function LoginUser({ setLogin }) {
                 Login
             </h2>
             <p className="mt-1 text-sm leading-6 text-slate-600">
-              Who are you, an Aladeen sympathizer!? 
+              Welcome back! Log in to see the latest new recipes!
             </p>
           </div>
 
