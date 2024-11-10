@@ -19,10 +19,10 @@ export default function LoginUser({ setLogin }) {
       });
   }
 
-  // TODO: redirect to user profile page if user is logged in
-  // if (loggedInUserID) {
-  //   navigate("/user/:id");
-  // } 
+  // redirect to user profile page if user is logged in
+  if (loggedInUserID) {
+    navigate(`/user/${loggedInUserID}`);
+  } 
 
   async function onSubmit(e) {
     e.preventDefault();

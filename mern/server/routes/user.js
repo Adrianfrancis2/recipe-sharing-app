@@ -98,3 +98,16 @@ router.delete("/:id", async (req, res) => {
 });
 
 export default router;
+
+/*
+These router requests may be simulated.
+1. Web dev tools -> Network -> New request
+2. Request type e.g. POST, PATCH, DELETE
+3. Update request URL: http://localhost:5050/user/...
+4. Match headers (Send a real request, edit & resend
+-> automatically fills out needed headers)
+5. Edit payload
+POST: newUser as a json
+PATCH: json with fields for user + new values
+DELETE: json with id only
+*/

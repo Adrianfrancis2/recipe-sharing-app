@@ -26,7 +26,7 @@ router.get("/:id", async (req, res) => {
   else res.status(200).send(result);
 });
 
-//  Create a new user
+//  Create a new recipe
 router.post("/", async (req, res) => {
   try {
     let newRecipe = {
@@ -34,6 +34,7 @@ router.post("/", async (req, res) => {
       desc: req.body.desc,
       ingredients: req.body.ingredients,
       steps: req.body.steps,
+      image: null,
     };
     let collection = await db.collection("recipes");
     let result = await collection.insertOne(newRecipe);
@@ -54,6 +55,7 @@ router.patch("/:id", async (req, res) => {
         desc: req.body.desc,
         ingredients: req.body.ingredients,
         steps: req.body.steps,
+        image: req.body.image,
       },
     };
 

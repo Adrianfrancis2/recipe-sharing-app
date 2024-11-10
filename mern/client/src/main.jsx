@@ -8,10 +8,13 @@ import {
 
 import App from "./App";
 import NewUser from "./components/CreateUser";
-import LoginUser from "./components/LoginUser"
-import UserList from "./components/UserList";
+import LoginUser from "./components/LoginUser";
+//  import Recipe from "./components/CreateRecipe";
+//  import UserList from "./components/UserList";
 import "./index.css";
+import { useState } from "react";
 
+//  Lists routes for webpage
 const router = createBrowserRouter([
   {
     path: "/",
@@ -50,11 +53,10 @@ const router = createBrowserRouter([
       {
         path: "/login",
         element: <LoginUser />,
-      }
+      },
     ]
-  },
+  }
 ]);
-
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
