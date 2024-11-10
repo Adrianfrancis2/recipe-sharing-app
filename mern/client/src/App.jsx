@@ -3,16 +3,16 @@ import { Outlet } from "react-router-dom";
 import Navbar from "./components/Navbar";
 
 const App = () => {
-  const [loggedInUserID, setLoggedInUserID] = useState(0);
+  const [loggedInUserID, setLoggedInUserID] = useState( (localStorage.getItem("userID")) ? localStorage.getItem("userID") : null);
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
+    localStorage.removeItem("userID");
     setLoggedInUserID(null);
   };
 
   return (
     <div className="w-full p-6">
-      <Navbar loggedInUserID={loggedInUserID} />
+      <Navbar loggedIn={loggedInUserID} logout={handleLogout} />
       <Outlet context={{ loggedInUserID, setLoggedInUserID }} />
     </div>
   );

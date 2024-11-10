@@ -58,7 +58,7 @@ export default function LoginUser({ setLogin }) {
       } else {
         setMessageData(response_data.msg.name);
 
-        localStorage.setItem("user", response_data.msg.username); // TODO: implement JWT? 
+        localStorage.setItem("userID", response_data.msg._id); // TODO: implement JWT? 
         setLoggedInUserID(response_data.msg._id);
         
         setForm({ username: "", password: "" });
