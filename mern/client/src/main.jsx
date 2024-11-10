@@ -11,6 +11,7 @@ import NewUser from "./components/CreateUser";
 import LoginUser from "./components/LoginUser";
 //  import Recipe from "./components/CreateRecipe";
 //  import UserList from "./components/UserList";
+import UserProfile from "./components/UserProfile";
 import "./index.css";
 import { useState } from "react";
 
@@ -53,6 +54,16 @@ const router = createBrowserRouter([
       {
         path: "/login",
         element: <LoginUser />,
+      },
+    ]
+  },
+  {
+    path: "/userprofile",
+    element: <App />,
+    children: [
+      {
+        path: "/userprofile",
+        element: <UserProfile />,
       },
     ]
   }

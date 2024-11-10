@@ -9,11 +9,31 @@ import { ObjectId } from "mongodb";
 //  user router controls requests starting with /user
 const router = express.Router();
 
-//  Get a list of all users
-router.get("/", async (req, res) =>  {
-  let collection = await db.collection("users");
-  let results = await collection.find({}).toArray();
-  res.status(200).send(results);
+// //  Get a list of all users
+// router.get("/", async (req, res) =>  {
+//   let collection = await db.collection("users");
+//   let results = await collection.find({}).toArray();
+//   res.status(200).send(results);
+// });
+
+// Get only one user
+router.get("/:id", async (req, res) => {
+  try {
+    const collection = await db.collection("users");
+
+    // Use findOne to fetch the user with the given ID
+    const user = await collection.findOne({ _id: new ObjectId(req.params.id) });
+
+    if (!user) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    // Return the user
+    res.status(200).send(user);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ message: "Error fetching user" });
+  }
 });
 
 // //  Fetch user login
