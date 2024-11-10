@@ -3,13 +3,14 @@ import * as ReactDOM from "react-dom/client";
 import {
   createBrowserRouter,
   RouterProvider,
+  Outlet,
 } from "react-router-dom";
+
 import App from "./App";
 import NewUser from "./components/CreateUser";
 import LoginUser from "./components/LoginUser"
 import UserList from "./components/UserList";
 import "./index.css";
-import { useState } from "react";
 
 const router = createBrowserRouter([
   {

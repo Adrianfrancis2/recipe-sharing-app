@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 
-export default function LoginUser({isLoggedIn, setLogin}) {
+export default function LoginUser({ setLogin }) {
   const [messageData, setMessageData] = useState("");
+  const {loggedInUserID, setLoggedInUserID} = useOutletContext();
 
   const [form, setForm] = useState({
       username: "",
@@ -18,9 +20,9 @@ export default function LoginUser({isLoggedIn, setLogin}) {
   }
 
   // TODO: redirect to user profile page if user is logged in
-  if (isLoggedIn) {
-    navigate("/user/:id");
-  } 
+  // if (loggedInUserID) {
+  //   navigate("/user/:id");
+  // } 
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -51,10 +53,14 @@ export default function LoginUser({isLoggedIn, setLogin}) {
       if (!response.ok) {
         setMessageData(response_data.msg);
         console.log(messageData);
-        throw new Error(`HTTP error! status: ${response_data.msg}`);
+        console.log("unable to log in");
+        // throw new Error(`HTTP error! status: ${response_data.msg}`);
       } else {
         setMessageData(response_data.msg.name);
-        setLogin(true);
+
+        localStorage.setItem("user", response_data.msg.username); // TODO: implement JWT? 
+        setLoggedInUserID(response_data.msg._id);
+        
         setForm({ username: "", password: "" });
         navigate("/");
         return;
