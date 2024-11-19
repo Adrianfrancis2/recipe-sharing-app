@@ -9,10 +9,10 @@ import {
 
 import App from "./App";
 import NewUser from "./components/CreateUser";
+import NewRecipe from "./components/CreateRecipe";
 import LoginUser from "./components/LoginUser";
 import UpdateHomePage from "./components/HomePage";
 
-//  import Recipe from "./components/CreateRecipe";
 //  import UserList from "./components/UserList";
 import UserProfile from "./components/UserProfile";
 import "./index.css";
@@ -70,7 +70,18 @@ const router = createBrowserRouter([
         element: <UserProfile />,
       },
     ]
+  },
+  {
+    path: "/newrecipe",
+    element: <App />,
+    children: [
+      {
+        path: "/newrecipe",
+        element: <NewRecipe />,
+      },
+    ],
   }
+  
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
