@@ -10,6 +10,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use("/recipe", recipe);
+app.use("/newrecipe", recipe);
 app.use("/user", user);
 app.use("/createuser", user);
 app.use("/login", loginuser);
