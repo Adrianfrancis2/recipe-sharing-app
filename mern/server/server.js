@@ -12,7 +12,7 @@ app.use(express.json());
 app.use("/recipe", recipe);
 app.use("/newrecipe", recipe);
 app.use("/user", user);
-app.use("/newuser", user);
+app.use("/createuser", user);
 app.use("/login", loginuser);
 
 //  Start Express server

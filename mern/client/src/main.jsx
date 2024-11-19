@@ -8,13 +8,13 @@ import {
 } from "react-router-dom";
 
 import App from "./App";
-import NewUser from "./components/CreateUser";
-import NewRecipe from "./components/CreateRecipe";
+import CreateUser from "./components/CreateUser";
 import LoginUser from "./components/LoginUser";
 import UpdateHomePage from "./components/HomePage";
 
 //  import UserList from "./components/UserList";
 import UserProfile from "./components/UserProfile";
+import CreateRecipe from "./components/CreateRecipe";
 import "./index.css";
 import { useState } from "react";
 
@@ -42,12 +42,12 @@ const router = createBrowserRouter([
     ],
   },
   {
-    path: "/newuser",
+    path: "/createuser",
     element: <App />,
     children: [
       {
-        path: "/newuser",
-        element: <NewUser />,
+        path: "/createuser",
+        element: <CreateUser />,
       },
     ],
   },
@@ -72,16 +72,15 @@ const router = createBrowserRouter([
     ]
   },
   {
-    path: "/newrecipe",
+    path: "/createrecipe",
     element: <App />,
     children: [
       {
-        path: "/newrecipe",
-        element: <NewRecipe />,
+        path: "/createrecipe",
+        element: <CreateRecipe />,
       },
-    ],
+    ]
   }
-  
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
