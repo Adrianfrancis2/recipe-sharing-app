@@ -53,7 +53,7 @@ export default function CreateRecipe() {
       recipe.append("steps", JSON.stringify(form.steps));
       recipe.append("image", form.image);
 
-      console.log(recipe);
+      console.log("New recipe: \n" + recipe);
 
       let response;
 

@@ -6,8 +6,14 @@ import db from "../db/connection.js";
 //  Help convert the id from string to ObjectId for the _id.
 import { ObjectId } from "mongodb";
 
+import multer from "multer";
+
 //  user router controls requests starting with /user
 const router = express.Router();
+
+//  needed to parse form data
+const upload = multer();
+
 
 //  Get a list of all recipes
 router.get("/", async (req, res) =>  {
@@ -27,7 +33,26 @@ router.get("/:id", async (req, res) => {
 });
 
 //  Create a new recipe
-router.post("/", async (req, res) => {
+router.post("/", upload.single("image"), async (req, res) => {
+  try {
+    console.log(req.body);
+    console.log(req.file);
+    let newRecipe = {
+      title: req.body.title,
+      desc: req.body.desc,
+      ingredients: req.body.ingredients,
+      steps: req.body.steps,
+      image: req.file ? req.file.buffer : null,
+    };
+    let collection = db.collection("recipes");
+    let result = await collection.insertOne(newRecipe);
+    res.status(201).send(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error adding recipe");
+  }
+  }
+  /*
   try {
     let newRecipe = {
       title: req.body.title,
@@ -43,7 +68,8 @@ router.post("/", async (req, res) => {
     console.error(err);
     res.status(500).send("Error adding recipe");
   }
-});
+    */
+);
 
 //  Update a recipe by id
 router.patch("/:id", async (req, res) => {
