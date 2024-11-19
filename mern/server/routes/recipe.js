@@ -9,14 +9,14 @@ import { ObjectId } from "mongodb";
 //  user router controls requests starting with /user
 const router = express.Router();
 
-//  Get a list of all users
+//  Get a list of all recipes
 router.get("/", async (req, res) =>  {
   let collection = await db.collection("recipes");
   let results = await collection.find({}).toArray();
   res.status(200).send(results);
 });
 
-//  Get a single record by id
+//  Get a single recipe by id
 router.get("/:id", async (req, res) => {
   let collection = await db.collection("records");
   let query = { _id: new ObjectId(req.params.id) };
@@ -45,7 +45,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-//  Update a record by id
+//  Update a recipe by id
 router.patch("/:id", async (req, res) => {
   try {
     const query = { _id: new ObjectId(req.params.id) };
@@ -68,7 +68,7 @@ router.patch("/:id", async (req, res) => {
   }
 });
 
-//  Delete a record by id
+//  Delete a recipe by id
 router.delete("/:id", async (req, res) => {
   try {
     const query = { _id: new ObjectId(req.params.id) };

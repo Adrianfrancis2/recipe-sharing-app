@@ -9,12 +9,12 @@ import { ObjectId } from "mongodb";
 //  user router controls requests starting with /user
 const router = express.Router();
 
-// //  Get a list of all users
-// router.get("/", async (req, res) =>  {
-//   let collection = await db.collection("users");
-//   let results = await collection.find({}).toArray();
-//   res.status(200).send(results);
-// });
+//  Get a list of all users
+router.get("/", async (req, res) =>  {
+  let collection = await db.collection("users");
+  let results = await collection.find({}).toArray();
+  res.status(200).send(results);
+});
 
 // Get only one user
 router.get("/:id", async (req, res) => {

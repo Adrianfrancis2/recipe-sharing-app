@@ -43,26 +43,23 @@ export default function CreateRecipe() {
       setMessageData("form empty");
       return;
     }
-
-    const recipe = { 
-      title: form.title,
-      desc: form.desc,
-      ingredients: form.ingredients,
-      steps: form.steps,
-      image: form.image,
-    };
-
-    console.log(recipe);
     
     try {
+
+      const recipe = new FormData();
+      recipe.append("title", form.title);
+      recipe.append("desc", form.desc);
+      recipe.append("ingredients", JSON.stringify(form.ingredients));
+      recipe.append("steps", JSON.stringify(form.steps));
+      recipe.append("image", form.image);
+
+      console.log(recipe);
+
       let response;
 
       response = await fetch("http://localhost:5050/newrecipe", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(recipe),
+        body: recipe,
       });
 
       if (response.status === 400) {
@@ -78,9 +75,6 @@ export default function CreateRecipe() {
       console.error('A problem occurred with your fetch operation: ', error);
     }
   }
-
-  console.log(form.ingredients);
-  console.log(form.steps);
 
   // This following section will display the form that takes the input from the user.
   return (
@@ -206,7 +200,7 @@ export default function CreateRecipe() {
                     name="image"
                     id="image"
                     placeholder="Recipe image"
-                    onChange={(e) => updateForm({ image: e.target.value })}
+                    onChange={(e) => updateForm({ image: e.target.files[0] })}
                   />
                   {/*Image preview*/}
                 </div>
