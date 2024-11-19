@@ -5,11 +5,15 @@ import { useNavigate } from "react-router-dom";
 import { useOutletContext } from "react-router-dom";
 
 export default function UserProfile() {
+    const [messageData, setMessageData] = useState("");
     const { loggedInUserID } = useOutletContext();
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [error, setError] = useState(null);
     const [isEditing, setIsEditing] = useState(false); // State to toggle form visibility
+
+    // regex pattern for password validation
+    const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/; 
 
     const [form, setForm] = useState({
       name: "",
@@ -19,12 +23,36 @@ export default function UserProfile() {
       confirm_password: "",
     });
 
+    // These methods will update the state properties.
+    function updateForm(value) {
+      return setForm((prev) => {
+        return { ...prev, ...value };
+      });
+    }
+
     const handleEditButtonClick = () => {
       setIsEditing(true); // Show the form
     };
   
+
+
     const handleFormSubmit = (e) => {
       e.preventDefault();
+
+      // Reset message data
+      setMessageData('');
+      
+      // check if something is being changed
+      if (form.username.trim() === "" && form.name.trim() === "" && form.new_password.trim() === "") {
+        setMessageData("you have to change something");
+        return;
+      }
+
+      // check if username already exists (get request)
+      fetch(`http://localhost:5050/user/`)
+
+      // check if something 
+
       setIsEditing(false); // Hide the form after submission
       // add form submission logic here (patch)
     };
@@ -60,7 +88,7 @@ export default function UserProfile() {
     
       return (
         <div>
-          {!isEditing ? (profilePage(user, handleEditButtonClick)) : (profileEdit(user, handleFormSubmit, form, setIsEditing))}
+          {!isEditing ? (profilePage(user, handleEditButtonClick)) : (profileEdit(user, handleFormSubmit, form, setIsEditing, updateForm, messageData))}
         </div>
       );
     }
@@ -105,13 +133,14 @@ function profilePage(user, handleEditButtonClick) {
   )
 }
 
-function profileEdit(user, handleFormSubmit, form, setIsEditing) {
+function profileEdit(user, handleFormSubmit, form, setIsEditing, updateForm, messageData) {
   return (
   <form 
     onSubmit={handleFormSubmit} 
     className="grid gap-y-2 gap-x-8 border rounded-lg overflow-hidden p-4"
   >
     <h2 className="text-lg font-medium mb-4">Edit Profile</h2>
+    {messageData == "you have to change something" ? <div className="text-sm text-red-600">A new username, name, or password must be specified.</div> : ""}
 
     <label
       htmlFor="username"
@@ -154,6 +183,51 @@ function profileEdit(user, handleFormSubmit, form, setIsEditing) {
     </div>
 
     <label
+      htmlFor="new_password"
+      className="block text-sm font-medium leading-6 text-slate-900"
+    >
+      New Password
+    </label>
+    <div className="mt-2">
+      <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-slate-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+        <input
+          type="text"
+          name="password"
+          id="password"
+          className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-slate-900 placeholder:text-slate-400 focus:ring-0 sm:text-sm sm:leading-6"
+          placeholder="Enter password"
+          value={form.new_password}
+          onChange={(e) => updateForm({ new_password: e.target.value })}
+        />
+      </div>
+    </div>
+    <div className="text-sm">
+    Password must contain at least 8 characters, and at least one letter and one number.
+    </div>
+    {messageData == "password not complex" ? <div className="text-sm text-red-600">Password does not meet complexity requirements.</div> : ""}
+    
+    <label
+      htmlFor="confirm_password"
+      className="block text-sm font-medium leading-6 text-slate-900"
+    >
+      Confirm New Password
+    </label>
+    <div className="mt-2">
+      <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-slate-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+        <input
+          type="text"
+          name="username"
+          id="username"
+          className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-slate-900 placeholder:text-slate-400 focus:ring-0 sm:text-sm sm:leading-6"
+          placeholder=""
+          value={form.confirm_password}
+          onChange={(e) => updateForm({ confirm_password: e.target.value })}
+        />
+      </div>
+    </div>
+    {messageData == "passwords do not match" ? <div className="text-sm text-red-600">Passwords do not match.</div> : ""}
+
+    <label
       htmlFor="current_password"
       className="block text-sm font-medium leading-6 text-slate-900"
     >
@@ -172,10 +246,12 @@ function profileEdit(user, handleFormSubmit, form, setIsEditing) {
         />
       </div>
     </div>
+    {messageData == "passwords does not match" ? <div className="text-sm text-red-600">Password does not match.</div> : ""}
 
     <div className="flex justify-end space-x-2">
       <input
-          type="submit"
+          type="button"
+          onClick={() => setIsEditing(false)}
           value="Cancel"
           className="inline-flex items-center justify-center whitespace-nowrap text-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-slate-100 hover:text-accent-foreground h-9 rounded-md px-3 cursor-pointer mt-4"
         />
