@@ -36,6 +36,14 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+// Get only usernames
+router.get("/check-username", async (req, res) => {
+  const { username } = req.query;
+  const collection = await db.collection("users");
+  const user = await collection.findOne({ username });
+  res.status(200).send({ exists: !!user });
+});
+
 // //  Fetch user login
 // router.post("/", async (req, res) => {
 //   try {
