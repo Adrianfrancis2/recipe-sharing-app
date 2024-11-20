@@ -16,6 +16,18 @@ router.get("/", async (req, res) =>  {
   res.status(200).send(results);
 });
 
+// Get only usernames
+router.get("/usernames", async (req, res) => {
+  try {
+    const collection = await db.collection("users");
+    const usernames = await collection.find({}, { projection: { username: 1, _id: 0 } }).toArray();
+    res.status(200).send(usernames.map(user => user.username));
+  } catch (error) {
+    console.error("Error fetching usernames:", error);
+    res.status(500).send({ message: "Error fetching usernames" });
+  }
+});
+
 // Get only one user
 router.get("/:id", async (req, res) => {
   try {
@@ -34,14 +46,6 @@ router.get("/:id", async (req, res) => {
     console.error(err);
     res.status(500).send({ message: "Error fetching user" });
   }
-});
-
-// Get only usernames
-router.get("/check-username", async (req, res) => {
-  const { username } = req.query;
-  const collection = await db.collection("users");
-  const user = await collection.findOne({ username });
-  res.status(200).send({ exists: !!user });
 });
 
 // //  Fetch user login
