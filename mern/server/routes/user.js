@@ -96,15 +96,23 @@ router.post("/", async (req, res) => {
 router.patch("/:id", async (req, res) => {
   try {
     const query = { _id: new ObjectId(req.params.id) };
-    const updates = {
-      $set: {
-        name: req.body.name,
-        username: req.body.username,
-        password: req.body.password,
-        recipe_ids: req.body.recipe_ids,
-        views: req.body.views,
-      },
-    };
+    // const updates = {
+    //   $set: {
+    //     name: req.body.name,
+    //     username: req.body.username,
+    //     password: req.body.password,
+    //     recipe_ids: req.body.recipe_ids,
+    //     views: req.body.views,
+    //   },
+    // };
+    const updates = { $set: {} };
+
+    // Dynamically add fields to the $set object
+    for (const key in req.body) {
+      if (req.body[key] !== undefined) {
+        updates.$set[key] = req.body[key];
+      }
+    }
 
     let collection = await db.collection("users");
     let result = await collection.updateOne(query, updates);

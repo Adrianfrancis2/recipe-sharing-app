@@ -102,12 +102,38 @@ export default function UserProfile() {
         }
     } 
 
+    // create payload
+    const updatedFields = {};
+    if (form.username.trim() !== "") updatedFields.username = form.username;
+    if (form.name.trim() !== "") updatedFields.name = form.name;
+    if (form.new_password.trim() !== "") updatedFields.password = form.new_password;
 
-    setIsEditing(false); // Hide the form after submission
+    // PATCH request
+    fetch(`http://localhost:5050/user/${loggedInUserID}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedFields),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to update user: " + response.statusText);
+        }
+        return response.json();
+      })
+      .then((result) => {
+        console.log("User updated successfully:", result);
+        setIsEditing(false); // Hide the form after submission
+      })
+      .catch((error) => {
+        console.error("Error updating user:", error);
+      });
 
-    // check if something 
-
-    // add form submission logic here (patch)
+      setUser((prevUser) => ({
+        ...prevUser,
+        ...updatedFields, // Merge updated fields into the existing user data
+      }));
   };
 
   useEffect(() => {
