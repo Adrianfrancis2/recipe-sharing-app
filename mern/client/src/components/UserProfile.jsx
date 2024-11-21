@@ -42,8 +42,6 @@ export default function UserProfile() {
     setIsEditing(true); // Show the form
   };
 
-
-
   const handleFormSubmit = (e) => {
     e.preventDefault();
 

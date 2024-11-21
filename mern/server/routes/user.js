@@ -1,4 +1,5 @@
 import express from "express";
+import bcrypt from "bcrypt";
 
 //  Help connect to database
 import db from "../db/connection.js";
@@ -8,6 +9,8 @@ import { ObjectId } from "mongodb";
 
 //  user router controls requests starting with /user
 const router = express.Router();
+
+// bryce for password hashing
 
 //  Get a list of all users
 router.get("/", async (req, res) =>  {
@@ -68,12 +71,14 @@ router.get("/:id", async (req, res) => {
 
 //  Create a new user
 router.post("/", async (req, res) => {
-  console.log("post request to /user routed")
+  // console.log("post request to /user routed")
+  const saltRounds = 10;
+  const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
   try {
     let newUser = {
       name: req.body.name,
       username: req.body.username,
-      password: req.body.password,
+      password: hashedPassword,
       recipe_ids: [],
       views: 0,
     };

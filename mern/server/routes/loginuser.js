@@ -1,4 +1,5 @@
 import express from "express";
+import bcrypt from "bcrypt";
 
 //  Help connect to database
 import db from "../db/connection.js";
@@ -8,7 +9,6 @@ import { ObjectId } from "mongodb";
 
 //  user router controls requests starting with /user
 const router = express.Router();
-
 
 //  Fetch user login
 router.post("/", async (req, res) => {
@@ -26,11 +26,14 @@ router.post("/", async (req, res) => {
       if (findUserName == null) {
         console.error("user not found");
         res.status(400).json({ msg: "user not found" });
-      } else if (findUserName.password != loginUser.password) {
-        console.error("incorrect password");
-        res.status(400).json({ msg: "incorrect password" });
       } else {
-        res.status(200).json({ msg: findUserName });
+        const isPasswordCorrect = await bcrypt.compare(findUserName.password, loginUser.password);
+        if (isPasswordCorrect) {
+          console.error("incorrect password");
+          res.status(400).json({ msg: "incorrect password" });
+        } else {
+          res.status(200).json({ msg: findUserName });
+        }
       }
     } catch (err) {
         console.log("oopsies");

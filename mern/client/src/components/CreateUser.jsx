@@ -52,7 +52,7 @@ export default function CreateUser() {
 
       // Create POST request
       let response;
-      response = await fetch("http://localhost:5050/newuser", {
+      response = await fetch("http://localhost:5050/createuser", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
