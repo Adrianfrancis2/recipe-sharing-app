@@ -15,6 +15,7 @@ import UpdateHomePage from "./components/HomePage";
 //  import UserList from "./components/UserList";
 import UserProfile from "./components/UserProfile";
 import CreateRecipe from "./components/CreateRecipe";
+import HomePage from "./components/HomePage"; //to connect to HomePage.jsx
 import "./index.css";
 import { useState } from "react";
 
@@ -27,6 +28,8 @@ const router = createBrowserRouter([
       {
         path: "/",
         // element: <UserList />,
+        //added new element for the HomePage
+        element: <HomePage />,
       },
     ],
     
