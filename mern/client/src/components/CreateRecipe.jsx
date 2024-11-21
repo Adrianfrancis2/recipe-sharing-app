@@ -1,8 +1,13 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function CreateRecipe() {
   const [messageData, setMessageData] = useState("");
+  const userID = localStorage.getItem("userID");
+
+  /*
+  Error if user is not logged in
+  */
 
   const [form, setForm] = useState({
     title: "",
@@ -10,6 +15,7 @@ export default function CreateRecipe() {
     ingredients: [],
     steps: [],
     image: null,
+    userid: userID,
   });
 
   const [newIngredient, setNewIngredient] = useState("");
@@ -17,13 +23,27 @@ export default function CreateRecipe() {
   const [newStep, setNewStep] = useState("");
 
   function addIngredient() {
+      if (newIngredient === "") return;
       updateForm({ ingredients: [...form.ingredients, newIngredient ]})
       setNewIngredient("");
   }
 
+  function removeIngredient(ingredient) {
+    updateForm({ ingredients: form.ingredients.filter((i) => i !== ingredient)});
+  }
+
   function addStep() {
-    updateForm({ steps: [...form.steps, newStep ]})
+    if (newStep === "") return;
+    updateForm({ steps: [...form.steps, newStep ]});
     setNewStep("");
+  }
+
+  function removeStep(step) {
+    updateForm({ steps: form.steps.filter((s) => s !== step)});
+  }
+
+  function removeImage() {
+    updateForm({ image: null });
   }
 
   const navigate = useNavigate();
@@ -43,7 +63,10 @@ export default function CreateRecipe() {
       setMessageData("form empty");
       return;
     }
+
+    let recipe_response;
     
+    //  Upload recipe (POST request)
     try {
 
       const recipe = new FormData();
@@ -52,28 +75,81 @@ export default function CreateRecipe() {
       recipe.append("ingredients", JSON.stringify(form.ingredients));
       recipe.append("steps", JSON.stringify(form.steps));
       recipe.append("image", form.image);
+      recipe.append("userid", form.userid);
 
       console.log("New recipe: \n" + recipe);
 
-      let response;
-
-      response = await fetch("http://localhost:5050/newrecipe", {
+      recipe_response = await fetch("http://localhost:5050/createrecipe", {
         method: "POST",
         body: recipe,
       });
 
-      if (response.status === 400) {
+      if (recipe_response.status === 400) {
         setMessageData("recipe exists");
-      } else if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      } else if (!recipe_response.ok) {
+        throw new Error(`HTTP error! status: ${recipe_response.status}`);
       } else {
         setMessageData("recipe created");
         setForm({ title: "", desc: "", ingredients: [], steps: [], image: null });
-        navigate("/");
       }
     } catch (error) {
       console.error('A problem occurred with your fetch operation: ', error);
     }
+
+    const recipe_response_data = await recipe_response.json();
+    const recipe_id = recipe_response_data.id;
+
+    console.log("New recipe id: " + recipe_id);
+    console.log("User id: " + userID);
+
+    const user_url = "http://localhost:5050/user/" + userID;
+    let user_get_response;
+    let user_obj;
+
+    //  Fetch user data (GET request)
+    try {
+      user_get_response = await fetch(user_url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (!user_get_response.ok) {
+        throw new Error(`HTTP error! status: ${user_get_response.status}`);
+      } else {
+        setMessageData("user data fetched");
+      }
+    } catch (error) {
+      console.error('A problem occured with your second fetch operation: ', error);
+    }
+
+    user_obj = await user_get_response.json();
+    const payload = {
+      password: user_obj.password,
+      recipe_ids: [...user_obj.recipe_ids, recipe_id],
+    };
+    console.log(" Updated Recipe IDs: " + payload.recipe_ids);
+    let user_patch_response;
+
+    try {
+      user_patch_response = await fetch(user_url, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+      if (!user_patch_response.ok) {
+        throw new Error(`HTTP error! status: ${user_patch_response.status}`);
+      } else {
+        setMessageData("user data patched");
+      };
+    } catch (error) {
+      console.error('A problem occured with your third fetch operation: ', error);
+    }
+
+    console.log("reached here");
+    navigate("/");
   }
 
   // This following section will display the form that takes the input from the user.
@@ -90,7 +166,27 @@ export default function CreateRecipe() {
               Recipe Information
             </h2>
             <p className="mt-1 text-sm leading-6 text-slate-600">
-              someone cooked here 
+              <strong>Title: </strong> {form.title || "Not provided"}
+            </p>
+            <p className="mt-1 text-sm leading-6 text-slate-600">
+              <strong>Description: </strong> {form.desc || "Not provided"}
+            </p>
+            <p className="mt-1 text-sm leading-6 text-slate-600">
+              <strong>Ingredients:</strong> {form.ingredients.length > 0
+              ? form.ingredients.map((ingredient, index) => <li className="list-circle list-inside pl-4" key={index}>{ingredient} 
+              <button className="ml-2 bg-gray-200 rounded-md px-1" onClick={() => removeIngredient(ingredient)} >Remove</button></li>)
+              : "No ingredients added"}
+            </p>
+            <p className="mt-1 text-sm leading-6 text-slate-600">
+              <strong>Instructions:</strong> {form.steps.length > 0
+              ? form.steps.map((step, index) => <li className="list-circle list-inside pl-4" key={index}>{step} 
+              <button className="ml-2 bg-gray-200 rounded-md px-1" onClick={() => removeStep(step)} >Remove</button></li>)
+              : "No steps added"}
+            </p>
+            <p className="mt-1 text-sm leading-6 text-slate-600">
+              <strong>Image:</strong> {form.image ? <button className="ml-2 bg-gray-200 rounded-md px-1" onClick={() => removeImage()} >
+                Remove</button> : ""}
+              {form.image ? <img className="max-w-40 max-h-40" src={URL.createObjectURL(form.image)}></img>: "Not provided"}
             </p>
           </div>
 

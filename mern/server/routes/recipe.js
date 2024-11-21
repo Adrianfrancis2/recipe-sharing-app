@@ -43,10 +43,11 @@ router.post("/", upload.single("image"), async (req, res) => {
       ingredients: req.body.ingredients,
       steps: req.body.steps,
       image: req.file ? req.file.buffer : null,
+      userid: req.body.userid,
     };
     let collection = db.collection("recipes");
     let result = await collection.insertOne(newRecipe);
-    res.status(201).send(result);
+    res.status(201).send({ id: result.insertedId });
   } catch (err) {
     console.error(err);
     res.status(500).send("Error adding recipe");
@@ -81,7 +82,8 @@ router.patch("/:id", async (req, res) => {
         desc: req.body.desc,
         ingredients: req.body.ingredients,
         steps: req.body.steps,
-        image: req.body.image,
+        image: req.file.buffer,
+        userid: req.body.userid,
       },
     };
 

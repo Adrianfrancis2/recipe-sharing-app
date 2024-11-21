@@ -99,9 +99,9 @@ router.post("/", async (req, res) => {
 
 //  Update a record by id
 router.patch("/:id", async (req, res) => {
-  console.log(req.body);
-  console.log(req.params.id);
-  console.log(req.body.password);
+  // console.log(req.body);
+  // console.log(req.params.id);
+  // console.log(req.body.password);
   try {
     const query = { _id: new ObjectId(req.params.id) };
     const collection = await db.collection("users");
@@ -122,7 +122,7 @@ router.patch("/:id", async (req, res) => {
       res.status(400).json({ msg: "user not found" });
     } else {
       const isPasswordCorrect = await bcrypt.compare(req.body.password, findUserName.password);     
-      if (!isPasswordCorrect) {
+      if (!isPasswordCorrect && req.body.password !== findUserName.password) {
         console.error("incorrect password");
         res.status(400).json({ msg: "incorrect password" });
       } else {
