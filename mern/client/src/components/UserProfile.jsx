@@ -105,8 +105,8 @@ export default function UserProfile() {
     const updatedFields = {};
     if (form.username.trim() !== "") updatedFields.username = form.username;
     if (form.name.trim() !== "") updatedFields.name = form.name;
-    if (form.new_password.trim() !== "") updatedFields.password = form.new_password;
-    if (form.curr_password.trim() !== "") updatedFields.curr_password = form.curr_password;
+    if (form.new_password.trim() !== "") updatedFields.new_password = form.new_password;
+    if (form.curr_password.trim() !== "") updatedFields.password = form.curr_password;
 
     // PATCH request
     fetch(`http://localhost:5050/user/${loggedInUserID}`, {

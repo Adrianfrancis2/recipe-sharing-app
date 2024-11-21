@@ -101,7 +101,7 @@ router.post("/", async (req, res) => {
 router.patch("/:id", async (req, res) => {
   console.log(req.body);
   console.log(req.params.id);
-  console.log(req.body.curr_password);
+  console.log(req.body.password);
   try {
     const query = { _id: new ObjectId(req.params.id) };
     const collection = await db.collection("users");
@@ -121,7 +121,7 @@ router.patch("/:id", async (req, res) => {
       console.error("user not found");
       res.status(400).json({ msg: "user not found" });
     } else {
-      const isPasswordCorrect = await bcrypt.compare(req.body.curr_password, findUserName.password);     
+      const isPasswordCorrect = await bcrypt.compare(req.body.password, findUserName.password);     
       if (!isPasswordCorrect) {
         console.error("incorrect password");
         res.status(400).json({ msg: "incorrect password" });
@@ -131,6 +131,8 @@ router.patch("/:id", async (req, res) => {
         for (const key in req.body) {
           if (key !== "password" && req.body[key] !== undefined) {
             updates.$set[key] = req.body[key];
+          } else if (key == "new_password") {
+            updates.$set[password] = req.body[new_password];
           }
         }
         const result = await collection.updateOne(query, updates);
