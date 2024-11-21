@@ -18,9 +18,9 @@ export default function UserProfile() {
   const [form, setForm] = useState({
     name: "",
     username: "",
-    password: "",
     new_password: "",
     confirm_password: "",
+    curr_password: "",
   });
 
   // These methods will update the state properties.
@@ -33,16 +33,16 @@ export default function UserProfile() {
   const handleEditButtonClick = () => {
     setForm({
       name: "",        // Reset to current user values or empty string
-      username: "",
-      password: "",                 // Leave password fields empty for security
-      new_password: "",
+      username: "",                 
+      new_password: "",         // Leave password fields empty for security
       confirm_password: "",
+      curr_password: "",
     });
     setMessageData(""); // Clear any previous messages
     setIsEditing(true); // Show the form
   };
 
-  const handleFormSubmit = (e) => {
+  async function handleFormSubmit(e) {
     e.preventDefault();
 
     // Reset message data
@@ -90,48 +90,54 @@ export default function UserProfile() {
     } 
 
     // check if current password matches
-    if (form.password.trim() === "") {
+    if (form.curr_password.trim() === "") {
       setMessageData("current password empty");
       return;
-    } else {
-        if (form.password != user.password) {
-        setMessageData("password does not match");
-        return;
-        }
-    } 
+    }
+    // } else {
+    //     if (form.password != user.password) {
+    //     setMessageData("password does not match");
+    //     return;
+    //     }
+    // } 
 
     // create payload
     const updatedFields = {};
     if (form.username.trim() !== "") updatedFields.username = form.username;
     if (form.name.trim() !== "") updatedFields.name = form.name;
     if (form.new_password.trim() !== "") updatedFields.password = form.new_password;
+    if (form.curr_password.trim() !== "") updatedFields.curr_password = form.curr_password;
 
     // PATCH request
     fetch(`http://localhost:5050/user/${loggedInUserID}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updatedFields),
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedFields),
     })
-      .then((response) => {
-        if (!response.ok) {
+      .then(async (response) => {
+      const response_data = await response.json();
+      if (!response.ok) {
+          setMessageData(response_data.msg);
+          console.log(response_data.msg);
+          console.error("unable to log in");
           throw new Error("Failed to update user: " + response.statusText);
         }
-        return response.json();
+        return response_data;
       })
       .then((result) => {
         console.log("User updated successfully:", result);
         setIsEditing(false); // Hide the form after submission
       })
       .catch((error) => {
-        console.error("Error updating user:", error);
+      console.error("Error updating user:", error);
       });
 
-      setUser((prevUser) => ({
-        ...prevUser,
-        ...updatedFields, // Merge updated fields into the existing user data
-      }));
+    setUser((prevUser) => ({
+      ...prevUser,
+      ...updatedFields, // Merge updated fields into the existing user data
+    }));
   };
 
   useEffect(() => {
@@ -269,9 +275,9 @@ function profileEdit(user, handleFormSubmit, form, setIsEditing, updateForm, mes
       <div className="mt-2">
         <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-slate-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
           <input
-            type="text"
-            name="password"
-            id="password"
+            type="password"
+            name="new_password"
+            id="new_password"
             className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-slate-900 placeholder:text-slate-400 focus:ring-0 sm:text-sm sm:leading-6"
             placeholder="Enter password"
             value={form.new_password}
@@ -293,9 +299,9 @@ function profileEdit(user, handleFormSubmit, form, setIsEditing, updateForm, mes
       <div className="mt-2">
         <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-slate-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
           <input
-            type="text"
-            name="username"
-            id="username"
+            type="password"
+            name="confirm_password"
+            id="confirm_password"
             className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-slate-900 placeholder:text-slate-400 focus:ring-0 sm:text-sm sm:leading-6"
             placeholder=""
             value={form.confirm_password}
@@ -306,7 +312,7 @@ function profileEdit(user, handleFormSubmit, form, setIsEditing, updateForm, mes
       {messageData == "new passwords do not match" ? <div className="text-sm text-red-600">Passwords do not match.</div> : ""}
 
       <label
-        htmlFor="current_password"
+        htmlFor="curr_password"
         className="block text-sm font-medium leading-6 text-slate-900"
       >
         Current Password
@@ -314,18 +320,18 @@ function profileEdit(user, handleFormSubmit, form, setIsEditing, updateForm, mes
       <div className="mt-2">
         <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-slate-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
           <input
-            type="text"
-            name="current_password"
-            id="current_password"
+            type="password"
+            name="curr_password"
+            id="curr_password"
             className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-slate-900 placeholder:text-slate-400 focus:ring-0 sm:text-sm sm:leading-6"
             placeholder=""
-            value={form.password}
-            onChange={(e) => updateForm({ password: e.target.value })}
+            value={form.curr_password}
+            onChange={(e) => updateForm({ curr_password: e.target.value })}
           />
         </div>
       </div>
       {messageData == "current password empty" ? <div className="text-sm text-red-600">You must enter your current password.</div> : ""}
-      {messageData == "password does not match" ? <div className="text-sm text-red-600">Password does not match.</div> : ""}
+      {messageData == "incorrect password" ? <div className="text-sm text-red-600">Password does not match.</div> : ""}
 
       <div className="flex justify-end space-x-2">
         <input

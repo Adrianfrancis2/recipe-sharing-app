@@ -99,8 +99,13 @@ router.post("/", async (req, res) => {
 
 //  Update a record by id
 router.patch("/:id", async (req, res) => {
+  console.log(req.body);
+  console.log(req.params.id);
+  console.log(req.body.curr_password);
   try {
     const query = { _id: new ObjectId(req.params.id) };
+    const collection = await db.collection("users");
+
     // const updates = {
     //   $set: {
     //     name: req.body.name,
@@ -110,18 +115,28 @@ router.patch("/:id", async (req, res) => {
     //     views: req.body.views,
     //   },
     // };
-    const updates = { $set: {} };
-
-    // Dynamically add fields to the $set object
-    for (const key in req.body) {
-      if (req.body[key] !== undefined) {
-        updates.$set[key] = req.body[key];
+    const findUserName = await collection.findOne(query);
+    console.log(findUserName);
+    if (findUserName == null) {
+      console.error("user not found");
+      res.status(400).json({ msg: "user not found" });
+    } else {
+      const isPasswordCorrect = await bcrypt.compare(req.body.curr_password, findUserName.password);     
+      if (!isPasswordCorrect) {
+        console.error("incorrect password");
+        res.status(400).json({ msg: "incorrect password" });
+      } else {
+        const updates = { $set: {} };
+        // Dynamically add fields to the $set object
+        for (const key in req.body) {
+          if (key !== "password" && req.body[key] !== undefined) {
+            updates.$set[key] = req.body[key];
+          }
+        }
+        const result = await collection.updateOne(query, updates);
+        res.status(200).send(result);
       }
     }
-
-    let collection = await db.collection("users");
-    let result = await collection.updateOne(query, updates);
-    res.status(200).send(result);
   } catch (err) {
     console.error(err);
     res.status(500).send("Error updating user");
