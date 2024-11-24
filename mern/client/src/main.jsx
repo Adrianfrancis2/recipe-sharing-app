@@ -35,55 +35,74 @@ const router = createBrowserRouter([
     
   },
   {
-    path: "/user/:id",
+    path: "/user/",
     element: <App />,
     children: [
       {
-        path: "",
+        path: ":id",
         element: <UserProfile />,
       },
-    ],
-  },
-  {
-    path: "/createuser",
-    element: <App />,
-    children: [
       {
-        path: "",
+        path: "profile",
+        element: <UserProfile />,
+      },
+      {
+        path: "create",
         element: <CreateUser />,
       },
-    ],
-  },
-  {
-    path: "/login",
-    element: <App />,
-    children: [
       {
-        path: "",
+        path: "login",
         element: <LoginUser />,
       },
-    ]
+    ],
   },
+
+  // nested paths under /user/
+  // {
+  //   path: "/createuser",
+  //   element: <App />,
+  //   children: [
+  //     {
+  //       path: "",
+  //       element: <CreateUser />,
+  //     },
+  //   ],
+  // },
+  // {
+  //   path: "/login",
+  //   element: <App />,
+  //   children: [
+  //     {
+  //       path: "",
+  //       element: <LoginUser />,
+  //     },
+  //   ]
+  // },
+  // {
+  //   path: "/profile",
+  //   element: <App />,
+  //   children: [
+  //     {
+  //       path: "",
+  //       element: <UserProfile />,
+  //     },
+  //   ]
+  // },
+
   {
-    path: "/userprofile",
+    path: "/recipe/",
     element: <App />,
     children: [
       {
-        path: "",
-        element: <UserProfile />,
+        path: ":id",
+        // element: <DisplayRecipe />,
       },
-    ]
-  },
-  {
-    path: "/createrecipe",
-    element: <App />,
-    children: [
       {
-        path: "",
+        path: "create",
         element: <CreateRecipe />,
       },
     ]
-  }
+  },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(

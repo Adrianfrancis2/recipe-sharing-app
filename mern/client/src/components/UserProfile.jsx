@@ -143,11 +143,11 @@ export default function UserProfile() {
 
   useEffect(() => {
     if (!loggedInUserID) {
-      navigate(`/login`);
+      navigate("/user/login");
       return;
     }
     if (profilePageID && profilePageID == loggedInUserID) {
-      navigate("/userprofile");
+      navigate("/user/profile");
       return;
     }
 
