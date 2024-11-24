@@ -13,7 +13,7 @@ const App = () => {
   return (
     <div className="w-full p-6">
       <Navbar loggedIn={loggedInUserID} logout={handleLogout} />
-      <Outlet context={{ loggedInUserID, setLoggedInUserID }} />
+      <Outlet context={{ loggedInUserID: loggedInUserID, setLoggedInUserID: setLoggedInUserID }} />
     </div>
   );
 };

@@ -1,18 +1,19 @@
 // research using useEffect
-import { useState } from "react";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useOutletContext } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 
 export default function UserProfile() {
   const [messageData, setMessageData] = useState("");
   const { loggedInUserID } = useOutletContext();
+  let params = useParams();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false); // State to toggle form visibility
-
+  console.log("params: " + params);
+  console.log("params.id: " + params.id);
   // regex pattern for password validation
+  const profilePageID = params.id;
   const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
 
   const [form, setForm] = useState({
@@ -145,10 +146,14 @@ export default function UserProfile() {
       navigate(`/login`);
       return;
     }
+    if (profilePageID && profilePageID == loggedInUserID) {
+      navigate("/userprofile");
+      return;
+    }
 
-    console.log(loggedInUserID);
+    let userID = profilePageID ? profilePageID : loggedInUserID;
     // get 
-    fetch(`http://localhost:5050/user/${loggedInUserID}`)
+    fetch(`http://localhost:5050/user/${userID}`)
       .then(response => {
         if (!response.ok) {
           throw new Error('Failed to fetch user: ' + response.statusText);
@@ -159,7 +164,7 @@ export default function UserProfile() {
         setUser(data);
       })
       .catch(error => console.error('Error fetching user:', error));
-  }, [loggedInUserID, navigate]);
+  }, [loggedInUserID, profilePageID, navigate]);
 
   if (error) {
     return <p>Error: {error}</p>;
@@ -169,31 +174,34 @@ export default function UserProfile() {
     return <p>Loading user profile...</p>;
   }
 
+  console.log("user.id: " + user._id);
+  console.log("logged in: " + loggedInUserID);
+
   return (
     <div>
-      {!isEditing ? (profilePage(user, handleEditButtonClick)) : (profileEdit(user, handleFormSubmit, form, setIsEditing, updateForm, messageData))}
+      {!isEditing ? (profilePage(user, loggedInUserID, handleEditButtonClick)) : (profileEdit(user, handleFormSubmit, form, setIsEditing, updateForm, messageData))}
     </div>
   );
 }
 
-function profilePage(user, handleEditButtonClick) {
+function profilePage(user, loggedInUserID, handleEditButtonClick) {
   return (
     <div className="border rounded-lg overflow-hidden p-4">
       <div className="grid grid-cols-2 gap-x-8 gap-y-2 border-b border-slate-900/10 pb-12 md:grid-cols-2">
         <div className="col-span-1 grid grid-cols-1 gap-x-8 gap-y-2">
           <div className="flex items-center space-x-1">
             <h3 className="text-lg font-semibold">
-              User Profile
+              {user.name}'s Profile
             </h3>
           </div>
-          <div className="flex items-center space-x-1">
+          {/* <div className="flex items-center space-x-1">
             <h2 className="text-base font-semibold leading-7 text-slate-900">
               Name:
             </h2>
             <span className="text-base text-slate-900" >
               {user.name}
             </span>
-          </div>
+          </div> */}
           <div className="flex items-center space-x-1">
             <h2 className="text-base font-semibold leading-7 text-slate-900">
               Username:
@@ -203,14 +211,18 @@ function profilePage(user, handleEditButtonClick) {
             </span>
           </div>
         </div>
-        <div className="col-span-1 text-right">
-          <input
-            type="button"
-            value="Edit Profile"
-            onClick={handleEditButtonClick}
-            className="inline-flex items-center justify-center whitespace-nowrap text-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-slate-100 hover:text-accent-foreground h-9 rounded-md px-3 cursor-pointer mt-4"
-          />
-        </div>
+        {(user._id == loggedInUserID) ? (
+          <div className="col-span-1 text-right">
+            <input
+              type="button"
+              value="Edit Profile"
+              onClick={handleEditButtonClick}
+              className="inline-flex items-center justify-center whitespace-nowrap text-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-slate-100 hover:text-accent-foreground h-9 rounded-md px-3 cursor-pointer mt-4"
+            />
+          </div>
+        ) : (
+          ""
+        )}
       </div>
     </div>
   )

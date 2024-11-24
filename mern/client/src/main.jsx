@@ -26,7 +26,7 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       {
-        path: "/",
+        path: "",
         // element: <UserList />,
         //added new element for the HomePage
         element: <HomePage />,
@@ -39,8 +39,8 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       {
-        path: "/user/:id",
-        // element: <UserProfile />,
+        path: "",
+        element: <UserProfile />,
       },
     ],
   },
@@ -49,7 +49,7 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       {
-        path: "/createuser",
+        path: "",
         element: <CreateUser />,
       },
     ],
@@ -59,7 +59,7 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       {
-        path: "/login",
+        path: "",
         element: <LoginUser />,
       },
     ]
@@ -69,7 +69,7 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       {
-        path: "/userprofile",
+        path: "",
         element: <UserProfile />,
       },
     ]
@@ -79,7 +79,7 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       {
-        path: "/createrecipe",
+        path: "",
         element: <CreateRecipe />,
       },
     ]
