@@ -5,16 +5,12 @@ import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 export default function UserProfile() {
   const [messageData, setMessageData] = useState("");
   const { loggedInUserID } = useOutletContext();
-  let params = useParams();
+  const { id: profilePageID } = useParams();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false); // State to toggle form visibility
-  console.log("params: " + params);
-  console.log("params.id: " + params.id);
-  // regex pattern for password validation
-  const profilePageID = params.id;
-  const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+  const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;   // regex pattern for password validation
 
   const [form, setForm] = useState({
     name: "",
@@ -95,12 +91,6 @@ export default function UserProfile() {
       setMessageData("current password empty");
       return;
     }
-    // } else {
-    //     if (form.password != user.password) {
-    //     setMessageData("password does not match");
-    //     return;
-    //     }
-    // } 
 
     // create payload
     const updatedFields = {};
@@ -147,12 +137,13 @@ export default function UserProfile() {
       return;
     }
     if (profilePageID && profilePageID == loggedInUserID) {
+      console.log(profilePageID);
       navigate("/user/profile");
       return;
     }
 
-    let userID = profilePageID ? profilePageID : loggedInUserID;
-    // get 
+    // get single user
+    const userID = profilePageID ? profilePageID : loggedInUserID;
     fetch(`http://localhost:5050/user/${userID}`)
       .then(response => {
         if (!response.ok) {
@@ -174,9 +165,6 @@ export default function UserProfile() {
     return <p>Loading user profile...</p>;
   }
 
-  console.log("user.id: " + user._id);
-  console.log("logged in: " + loggedInUserID);
-
   return (
     <div>
       {!isEditing ? (profilePage(user, loggedInUserID, handleEditButtonClick)) : (profileEdit(user, handleFormSubmit, form, setIsEditing, updateForm, messageData))}
@@ -194,20 +182,21 @@ function profilePage(user, loggedInUserID, handleEditButtonClick) {
               {user.name}'s Profile
             </h3>
           </div>
-          {/* <div className="flex items-center space-x-1">
-            <h2 className="text-base font-semibold leading-7 text-slate-900">
-              Name:
-            </h2>
-            <span className="text-base text-slate-900" >
-              {user.name}
-            </span>
-          </div> */}
           <div className="flex items-center space-x-1">
             <h2 className="text-base font-semibold leading-7 text-slate-900">
               Username:
             </h2>
             <span className="text-base text-slate-900" >
               {user.username}
+            </span>
+          </div>
+          {/* LIST RECIPE IDS (DEPRECATE LATER) */}
+          <div className="flex items-center space-x-1">
+            <h2 className="text-base font-semibold leading-7 text-slate-900">
+              Recipe IDs:
+            </h2>
+            <span className="text-base text-slate-900" >
+              {user.recipe_ids}
             </span>
           </div>
         </div>

@@ -24,12 +24,16 @@ router.get("/", async (req, res) =>  {
 
 //  Get a single recipe by id
 router.get("/:id", async (req, res) => {
-  let collection = await db.collection("records");
-  let query = { _id: new ObjectId(req.params.id) };
-  let result = await collection.findOne(query);
+  try {
+    const collection = await db.collection("recipes");
+    const recipe = await collection.findOne({ _id: new ObjectId(req.params.id) });
 
-  if (!result) res.status(404).send("Not found");
-  else res.status(200).send(result);
+    if (!recipe) res.status(404).send({ message: "Recipe not found" });
+    res.status(200).send(recipe);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ message: "Error fetching recipe" });
+  }
 });
 
 //  Create a new recipe

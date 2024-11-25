@@ -35,14 +35,11 @@ router.get("/usernames", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     const collection = await db.collection("users");
-
     // Use findOne to fetch the user with the given ID
     const user = await collection.findOne({ _id: new ObjectId(req.params.id) });
-
     if (!user) {
       return res.status(404).send({ message: "User not found" });
     }
-
     // Return the user
     res.status(200).send(user);
   } catch (err) {
@@ -116,7 +113,6 @@ router.patch("/:id", async (req, res) => {
     //   },
     // };
     const findUserName = await collection.findOne(query);
-    console.log(findUserName);
     if (findUserName == null) {
       console.error("user not found");
       res.status(400).json({ msg: "user not found" });

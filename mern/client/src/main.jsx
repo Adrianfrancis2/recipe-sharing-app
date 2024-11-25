@@ -10,14 +10,13 @@ import {
 import App from "./App";
 import CreateUser from "./components/CreateUser";
 import LoginUser from "./components/LoginUser";
-import UpdateHomePage from "./components/HomePage";
-
-//  import UserList from "./components/UserList";
 import UserProfile from "./components/UserProfile";
 import CreateRecipe from "./components/CreateRecipe";
-import HomePage from "./components/HomePage"; //to connect to HomePage.jsx
+import RecipeCard from "./components/RecipeCard";
+import HomePage from "./components/HomePage";     //to connect to HomePage.jsx
 import "./index.css";
-import { useState } from "react";
+
+import UpdateHomePage from "./components/HomePage";
 
 //  Lists routes for webpage
 const router = createBrowserRouter([
@@ -95,7 +94,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: ":id",
-        // element: <DisplayRecipe />,
+        element: <RecipeCard />,
       },
       {
         path: "create",
