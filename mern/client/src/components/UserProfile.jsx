@@ -131,6 +131,7 @@ export default function UserProfile() {
     }));
   };
 
+  // Fetch user details
   useEffect(() => {
     if (!loggedInUserID) {
       navigate("/user/login");
@@ -165,9 +166,58 @@ export default function UserProfile() {
     return <p>Loading user profile...</p>;
   }
 
+
+  // Gets recipes linked to user
+  const RecipeList = () => {
+    const [recipes, setRecipes] = useState([]); // Store fetched recipes
+    const [error, setError] = useState(null);  // Store error message (if any)
+  
+    // Function to fetch recipes
+    const fetchRecipes = async (ids) => {
+      try {
+        console.log(ids);
+        // Fetch all recipes concurrently and parse JSON responses
+        return await Promise.all(
+          ids.map((id) =>
+            fetch(`http://localhost:5050/recipe/${id}`).then((res) => {
+              if (!res.ok) throw new Error(`Failed to fetch recipe with ID: ${id}`);
+              return res.json();
+            })
+          )
+        );
+      } catch (error) {
+        console.error("Error fetching recipes:", error);
+        console.log(error);
+        throw error; // Rethrow to handle in calling code
+      }
+    };
+  
+    useEffect(() => {
+      // Fetch recipes when the component mounts
+      fetchRecipes(user.recipe_ids)
+        .then(setRecipes)          // Update state with fetched recipes
+        .catch((err) => setError(err.message)); // Update error state if fetch fails
+    }, []); // Empty dependency array ensures this runs once on mount
+  
+    // Render recipes or show error
+    return (
+      <div>
+        <div className="border rounded-lg overflow-hidden p-4 mt-4">
+          <h3 className="text-lg font-semibold">
+            Recipes
+          </h3>
+        </div>
+        {displayRecipes(error, recipes)}
+      </div>
+    );
+  };
+
+
+
   return (
     <div>
       {!isEditing ? (profilePage(user, loggedInUserID, handleEditButtonClick)) : (profileEdit(user, handleFormSubmit, form, setIsEditing, updateForm, messageData))}
+      <RecipeList />
     </div>
   );
 }
@@ -349,4 +399,43 @@ function profileEdit(user, handleFormSubmit, form, setIsEditing, updateForm, mes
       </div>
     </form>
   )
+}
+
+// Separate function to display recipes or error message
+function displayRecipes(error, recipes) {
+  if (error) {
+    return <p style={{ color: "red" }}>Error: {error}</p>;
+  }
+  return (
+    // <div>
+    //   <ul>
+    //     {recipes.map((recipe, index) => (
+    //       <div>
+    //         <li key={index}>{recipe.title}</li>
+    //         <img src={'data:image/jpeg;base64,' + recipe.image} style={{ width: '300px', height: 'auto' }} />
+    //       </div>
+    //     ))}
+    //   </ul>
+    // </div>
+    <div className="p-4">
+      {/* Grid Container */}
+      <div className="grid grid-cols-3 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {/* Map over items */}
+        {recipes.map((recipe, index) => (
+          <div
+            key={index}
+            className="bg-gray-50 rounded shadow-md text-center flex flex-col items-center justify-center p-4"
+          >
+            {/* Image */}
+            <div className="w-full h-40 flex items-center justify-center">
+              <img src={'data:image/jpeg;base64,' + recipe.image} style={{ width: '300px', height: 'auto' }} className="max-w-full max-h-full object-contain rounded" />
+            </div>
+            <h3 className="text-lg font-semibold mt-2">
+              {recipe.title}
+            </h3>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
