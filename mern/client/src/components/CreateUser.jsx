@@ -1,9 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+//creating a user account
 export default function CreateUser() {
+  //messageData: store messages for user
+  //setMessageData: function to update messageData
   const [messageData, setMessageData] = useState("");
 
+  //holding input values for creating a user 
+    //components on create profile screen and user log in
   const [form, setForm] = useState({
     name: "",
     username: "",
@@ -13,14 +18,14 @@ export default function CreateUser() {
 
   const navigate = useNavigate();
 
-  // These methods will update the state properties.
+  //update the state properties.
   function updateForm(value) {
     return setForm((prev) => {
       return { ...prev, ...value };
     });
   }
 
-  // This function will handle the submission.
+  //handle the submission
   async function onSubmit(e) {
     e.preventDefault();
 
@@ -60,7 +65,7 @@ export default function CreateUser() {
         body: JSON.stringify(person),
       });
 
-      if (response.status == 400) {
+      if (response.status == 400) { //checking for 400 Bad Request error (indicates server could not process the request)
         setMessageData("username exists");
       } else if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -75,7 +80,7 @@ export default function CreateUser() {
     }
   }
 
-  // This following section will display the form that takes the input from the user.
+  //display the form that takes the input from the user.
   return (
     <>
       <h3 className="text-lg font-semibold p-4">Create New User Account</h3>

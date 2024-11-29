@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 
+//RecipeCard: displays information about specific recipe 
+
+//defines React component 
 export default function RecipeCard() {
   const { loggedInUserID } = useOutletContext();
   const { id: recipeID } = useParams();
@@ -12,7 +15,7 @@ export default function RecipeCard() {
 
   useEffect(() => {
     if (!loggedInUserID) {
-      navigate("/user/login");
+      navigate("/user/login"); //navigate to user login page
       return;
     }
 
@@ -47,9 +50,9 @@ export default function RecipeCard() {
   }, [loggedInUserID, recipeID, navigate]);
 
   useEffect(() => {
-    if (recipe && recipe.userid) {
-      // get recipe author
-      fetch(`http://localhost:5050/user/${recipe.userid}`)
+    if (recipe && recipe.userid) { //checks object is not null or undefined
+      //get recipe author (with userid)
+      fetch(`http://localhost:5050/user/${recipe.userid}`) //construct URL using userid and recipe
       .then(response => {
         if (!response.ok) {
           throw new Error('Failed to fetch recipe author: ' + response.statusText);
@@ -57,12 +60,13 @@ export default function RecipeCard() {
         return response.json();
       })
       .then(data => {
-        setRecipeAuthor(data);
+        setRecipeAuthor(data); //updates recipeAuthor
       })
       .catch(error => console.error('Error fetching recipe author:', error));
     }
   }, [recipe]);
 
+  //error handling
   if (error) {
     return <p>Error: {error}</p>;
   }
@@ -79,15 +83,19 @@ export default function RecipeCard() {
   );
 }
 
+
+//display detailed informationa bout recipe 
+  //author, ingredients, steps, image etc
 function recipePage(recipe, recipeAuthor) {
-  const authorLine = recipeAuthor ? `Contributed by ${recipeAuthor.name} (@${recipeAuthor.username})` : "Contributer unknown";
-  const imageSrc = (recipe.image) ? (`data:image/jpeg;base64,${recipe.image}`) : null;
+  const authorLine = recipeAuthor ? `Contributed by ${recipeAuthor.name} (@${recipeAuthor.username})` : "Contributer unknown"; //creates string with author's name & username
+  const imageSrc = (recipe.image) ? (`data:image/jpeg;base64,${recipe.image}`) : null; //converts image data into a data URI
   const ingredients = JSON.parse(recipe.ingredients);
   const ingredientsLeft = ingredients.slice(0, Math.ceil(ingredients.length / 2));
   const ingredientsRight = ingredients.slice(Math.ceil(ingredients.length / 2), ingredients.length);
-  const steps = JSON.parse(recipe.steps);
+  const steps = JSON.parse(recipe.steps); //convert JSON string into array of steps used to dispaly recipe instructions
 
 
+  //display
   return (
     <div className="flex justify-center min-h-full items-center">
       <div className="border rounded-lg overflow-hidden p-4 w-full h-full max-w-2xl bg-white shadow-md grid">

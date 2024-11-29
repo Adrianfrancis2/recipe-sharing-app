@@ -28,7 +28,8 @@ export default function Navbar({ loggedIn, logout }) {
   );
 }
 
-
+//react functional component
+  //defines navigation bar for a logged-in user (display)
 function LoggedInNavBar(ID, logout) {
   return (
     <div>
@@ -46,7 +47,8 @@ function LoggedInNavBar(ID, logout) {
   )
 }
 
-
+//react functional component
+  //defines navigation bar for guest user (display)
 function guestNavBar() {
   return (
     <div>
