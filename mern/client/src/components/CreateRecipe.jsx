@@ -23,39 +23,49 @@ export default function CreateRecipe() {
   const [newStep, setNewStep] = useState("");
 
   function addIngredient() {
+    // check if empty string --> function does nothing
       if (newIngredient === "") return;
+      //updates ingredients field from the form 
+        //appends value of newIngredient to exisiting list
       updateForm({ ingredients: [...form.ingredients, newIngredient ]})
       setNewIngredient("");
   }
 
+  //remove specific ingredient
   function removeIngredient(ingredient) {
     updateForm({ ingredients: form.ingredients.filter((i) => i !== ingredient)});
   }
 
   function addStep() {
+    //check if empty string --> function does nothing
+      //prevents adding empty steps to list
     if (newStep === "") return;
+    //updaates steps field from the form 
+      //append newStep to exisiting list 
     updateForm({ steps: [...form.steps, newStep ]});
     setNewStep("");
   }
 
+  //remove specific step 
   function removeStep(step) {
     updateForm({ steps: form.steps.filter((s) => s !== step)});
   }
 
+  //remove image
   function removeImage() {
     updateForm({ image: null });
   }
 
   const navigate = useNavigate();
 
-  // These methods will update the state properties.
+  //update the state properties.
   function updateForm(value) {
     return setForm((prev) => {
       return { ...prev, ...value };
     });
   }
 
-  // This function will handle the submission.
+  //handle the submission.
   async function onSubmit(e) {
     e.preventDefault();
 
@@ -69,6 +79,7 @@ export default function CreateRecipe() {
     //  Upload recipe (POST request)
     try {
 
+      //takes data from form and organizies to specific sections
       const recipe = new FormData();
       recipe.append("title", form.title);
       recipe.append("desc", form.desc);
@@ -84,9 +95,10 @@ export default function CreateRecipe() {
         body: recipe,
       });
 
-      if (recipe_response.status === 400) {
-        setMessageData("recipe exists");
-      } else if (!recipe_response.ok) {
+      //handles response from a fetch request 
+      if (recipe_response.status === 400) { //response status 400: indicates a bad request 
+        setMessageData("recipe exists"); //message to user 
+      } else if (!recipe_response.ok) { //throws error 
         throw new Error(`HTTP error! status: ${recipe_response.status}`);
       } else {
         setMessageData("recipe created");
@@ -99,6 +111,7 @@ export default function CreateRecipe() {
     const recipe_response_data = await recipe_response.json();
     const recipe_id = recipe_response_data.id;
 
+    //outputs messages to browser console
     console.log("New recipe id: " + recipe_id);
     console.log("User id: " + userID);
 
@@ -108,12 +121,14 @@ export default function CreateRecipe() {
 
     //  Fetch user data (GET request)
     try {
+      //make HTTP Request
       user_get_response = await fetch(user_url, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
       });
+      //check if boolean response was successful 
       if (!user_get_response.ok) {
         throw new Error(`HTTP error! status: ${user_get_response.status}`);
       } else {
@@ -124,11 +139,15 @@ export default function CreateRecipe() {
     }
 
     user_obj = await user_get_response.json();
+    //prepare payload for updating user data
     const payload = {
+      //password retains the current password from user data
       password: user_obj.password,
       recipe_ids: [...user_obj.recipe_ids, recipe_id],
     };
     console.log(" Updated Recipe IDs: " + payload.recipe_ids);
+    
+    //perform a patch request to udpate user data
     let user_patch_response;
 
     try {
@@ -137,10 +156,11 @@ export default function CreateRecipe() {
         headers: {
           "Content-Type": "application/json",
         },
+        //converts payload aboject into JSON string 
         body: JSON.stringify(payload),
       });
       if (!user_patch_response.ok) {
-        throw new Error(`HTTP error! status: ${user_patch_response.status}`);
+        throw new Error(`HTTP error! status: ${user_patch_response.status}`); //throw error with HTTP status code 
       } else {
         setMessageData("user data patched");
       };
@@ -152,7 +172,8 @@ export default function CreateRecipe() {
     navigate("/");
   }
 
-  // This following section will display the form that takes the input from the user.
+  //display the form that takes the input from the user.
+    //screen output seen by the user
   return (
     <>
       <h3 className="text-lg font-semibold p-4">Create New Recipe</h3>
@@ -312,3 +333,4 @@ export default function CreateRecipe() {
     </>
   );
 }
+
