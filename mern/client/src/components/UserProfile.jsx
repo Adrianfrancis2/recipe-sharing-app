@@ -4,7 +4,7 @@ import { useNavigate, useOutletContext, useParams, Link } from "react-router-dom
 
 export default function UserProfile() {
   const [messageData, setMessageData] = useState("");
-  const { loggedInUserID } = useOutletContext();
+  const { loggedInUserID: loggedInUserID } = useOutletContext();
   const { id: profilePageID } = useParams();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);

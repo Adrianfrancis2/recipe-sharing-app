@@ -1,8 +1,88 @@
-import { NavLink } from "react-router-dom";
-import { useOutletContext } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { NavLink, useOutletContext, Link } from "react-router-dom";
 
-export default function Navbar({ loggedInUserID }) {
+export default function HomePage() {
+  const { loggedInUserID: loggedInUserID } = useOutletContext();
 
+  return (
+    <div>
+      {loggedInUserID ? (loggedInHomePage(displayRecipes)) : (guestHomePage())}
+    </div>
+  )
+}
+
+// homepage for logged-in user: display recipe cards
+function loggedInHomePage (displayRecipes) {
+  const [recipes, setRecipes] = useState([]); 
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // get all recipes
+    fetch("http://localhost:5050/recipe")
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch recipes: ' + response.statusText);
+        }
+        return response.json();
+      })
+      .then(data => {
+        setRecipes(data);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error('Error fetching recipes:', error)
+        setError(error.message);
+        setLoading(false);
+      });
+  }, []);
+
+  return (
+    <div>
+      {displayRecipes(error, recipes, loading)}
+    </div>
+  );
+}
+
+// function to display recipes or error message
+function displayRecipes(error, recipes, loading) {
+  if (error) {
+    return <p style={{ color: "red" }}>Error: {error}</p>;
+  } else if (loading) {
+    return <p>Loading recipes...</p>;
+  } else if (!recipes || recipes.length === 0) {
+    return <p>No recipes found. Try creating a new one!</p>;
+  }
+  return (
+    <div className="p-4">
+      {/* Grid Container */}
+      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        {/* Map over items */}
+        {recipes.map((recipe, index) => (
+          <Link
+            key={index}
+            to={`/recipe/${recipe._id}`}
+            className="bg-gray-50 rounded shadow-md text-center flex flex-col items-center justify-center p-4 transition-transform transform hover:scale-105 duration-300"
+          >
+            {/* Image */}
+            <div className="w-full h-40 flex items-center justify-center rounded">
+              <img src={'data:image/jpeg;base64,' + recipe.image} 
+                  className="max-w-full max-h-full object-contain rounded"
+                  alt={`Recipe: ${recipe.title}`}/>
+            </div>
+
+            <h3 className="text-lg font-semibold mt-2">
+              {recipe.title}
+            </h3>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// homepage for guest user
+function guestHomePage () {
   //banner at top --> link to home page 
   return (
     <div className="h-screen flex items-center justify-center">
@@ -86,38 +166,8 @@ export default function Navbar({ loggedInUserID }) {
             transform: 'rotate(5deg) translateX(190%) translateY(-130%)',
           }}
         /> */}
-        {loggedInUserID ? (LoggedInNavBar(loggedInUserID, logout)) : ""}
+        {/* {loggedInUserID ? (LoggedInNavBar(loggedInUserID, logout)) : ""} */}
       </nav>
     </div>
   );
 }
-
-
-function LoggedInNavBar(ID) {
-  return (
-    <div>
-      <div className="col-span-4"> </div>
-      <NavLink className="inline-flex justify-center items-center col-span-1 whitespace-nowrap text-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-slate-100 h-9 rounded-md px-3" to={`/user/${ ID }`}>
-        User Profile
-      </NavLink>
-    </div>
-  )
-}
-
-
-
-function guestNavBar() {
-  return (
-    <div>
-      <div className="col-span-3"> </div>
-      <NavLink className="inline-flex justify-center items-center col-span-1 whitespace-nowrap text-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-slate-100 h-9 rounded-md px-3" to="/login">
-        Login
-      </NavLink>
-      <NavLink className="inline-flex justify-center items-center col-span-1 whitespace-nowrap text-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-slate-100 h-9 rounded-md px-3" to="/newuser">
-        Create New User
-      </NavLink>
-    </div>
-  )
-}
-
-

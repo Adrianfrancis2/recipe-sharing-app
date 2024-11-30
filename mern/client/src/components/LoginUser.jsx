@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 
 //handles login functionality
 export default function LoginUser({ setLogin }) {
   const [messageData, setMessageData] = useState("");
-  const {loggedInUserID, setLoggedInUserID} = useOutletContext();
+  const {loggedInUserID: loggedInUserID, setLoggedInUserID: setLoggedInUserID} = useOutletContext();
 
   //contents of the form
   //form is an object representing login form fields

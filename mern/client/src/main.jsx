@@ -26,7 +26,6 @@ const router = createBrowserRouter([
     children: [
       {
         path: "",
-        // element: <UserList />,
         //added new element for the HomePage
         element: <HomePage />,
       },
@@ -55,39 +54,6 @@ const router = createBrowserRouter([
       },
     ],
   },
-
-  // nested paths under /user/
-  // {
-  //   path: "/createuser",
-  //   element: <App />,
-  //   children: [
-  //     {
-  //       path: "",
-  //       element: <CreateUser />,
-  //     },
-  //   ],
-  // },
-  // {
-  //   path: "/login",
-  //   element: <App />,
-  //   children: [
-  //     {
-  //       path: "",
-  //       element: <LoginUser />,
-  //     },
-  //   ]
-  // },
-  // {
-  //   path: "/profile",
-  //   element: <App />,
-  //   children: [
-  //     {
-  //       path: "",
-  //       element: <UserProfile />,
-  //     },
-  //   ]
-  // },
-
   {
     path: "/recipe/",
     element: <App />,
