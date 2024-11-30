@@ -52,8 +52,8 @@ export default function Navbar({ loggedInUserID }) {
             bottom: '-140px',
             transform: 'rotate(5deg) translateX(190%) translateY(-130%)',
           }}
-        />
-        {/* <img
+        /> 
+        {/* <img 
           src="HERE" // Replace with your image URL
           alt="HERE Image"
           className="w-40 h-50 mt-60 ml-17"  // Add styling as needed

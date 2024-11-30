@@ -2,15 +2,19 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useOutletContext } from "react-router-dom";
 
+//handles login functionality
 export default function LoginUser({ setLogin }) {
   const [messageData, setMessageData] = useState("");
   const {loggedInUserID, setLoggedInUserID} = useOutletContext();
 
+  //contents of the form
+  //form is an object representing login form fields
   const [form, setForm] = useState({
       username: "",
       password: "",
   });
 
+  //redirect users after a succeessful login to homepage
   const navigate = useNavigate();
 
   function updateForm(value) {
@@ -25,7 +29,9 @@ export default function LoginUser({ setLogin }) {
   } 
 
   async function onSubmit(e) {
+    //no reloading page when form submitted
     e.preventDefault();
+    //function to reset messageData to empty string before processing the form
     setMessageData("");
 
     if (!form.username || !form.password) {
@@ -33,6 +39,7 @@ export default function LoginUser({ setLogin }) {
       return;
     }
 
+    //create person object with username & password
     const person = { 
       username: form.username,
       password: form.password,
@@ -40,7 +47,7 @@ export default function LoginUser({ setLogin }) {
 
     try {
       let response;
-      response = await fetch("http://localhost:5050/login", {
+      response = await fetch("http://localhost:5050/login", { //sends HTTP POST request to login
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -50,6 +57,7 @@ export default function LoginUser({ setLogin }) {
 
       let response_data = await response.json();
 
+      //validating response then continues based on boolean evalution 
       if (!response.ok) {
         setMessageData(response_data.msg);
         console.log(messageData);
@@ -72,7 +80,9 @@ export default function LoginUser({ setLogin }) {
 
   }
 
-  // This following section will display the form that takes the input from the user.
+  //display the form that takes the input from the user.
+    //each part of form broken down into sections
+      //can change specifications of each display section
   return (
     <>
       <h3 className="text-lg font-semibold p-4">Login to Existing Account</h3>
