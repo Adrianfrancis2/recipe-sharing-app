@@ -11,11 +11,11 @@ const App = () => {
   };
 
   return (
-    <div className="w-full p-4">
-      <div className="fixed top-0 w-full max-h-24 z-10 bg-white p-4 pr-8">
+    <div className="w-full">
+      <div className="fixed top-0 w-full max-h-24 z-10 bg-white p-4 pr-8 shadow">
         <Navbar loggedIn={loggedInUserID} logout={handleLogout} />
       </div>
-      <div className="pt-20 p-4">
+      <div className="pt-28 p-4">
         <Outlet context={{ loggedInUserID: loggedInUserID, setLoggedInUserID: setLoggedInUserID }} />
       </div>
     </div>
