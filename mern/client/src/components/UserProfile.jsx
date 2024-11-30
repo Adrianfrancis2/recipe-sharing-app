@@ -1,6 +1,6 @@
 // research using useEffect
 import { useState, useEffect } from "react";
-import { useNavigate, useOutletContext, useParams } from "react-router-dom";
+import { useNavigate, useOutletContext, useParams, Link } from "react-router-dom";
 
 export default function UserProfile() {
   const [messageData, setMessageData] = useState("");
@@ -171,6 +171,7 @@ export default function UserProfile() {
   const RecipeList = () => {
     const [recipes, setRecipes] = useState([]); // Store fetched recipes
     const [error, setError] = useState(null);  // Store error message (if any)
+    const [loading, setLoading] = useState(true); // Store loading state
   
     // Function to fetch recipes
     const fetchRecipes = async (ids) => {
@@ -195,74 +196,86 @@ export default function UserProfile() {
     useEffect(() => {
       // Fetch recipes when the component mounts
       fetchRecipes(user.recipe_ids)
-        .then(setRecipes)          // Update state with fetched recipes
-        .catch((err) => setError(err.message)); // Update error state if fetch fails
+        .then((fetchedRecipes) => {  // Update state with fetched recipes
+          setRecipes(fetchedRecipes); // Update state with fetched recipes
+          setLoading(false); // Update loading state
+        })         
+        .catch((err) => { // Update error state if fetch fails
+          setError(err.message)
+          setLoading(false)
+        }); 
     }, []); // Empty dependency array ensures this runs once on mount
-  
+
     // Render recipes or show error
     return (
       <div>
-        <div className="border rounded-lg overflow-hidden p-4 mt-4">
-          <h3 className="text-lg font-semibold">
+        <div className="border rounded-lg overflow-hidden p-4 mt-4 relative">
+          <h3 className="text-lg font-semibold pb-2">
             Recipes
           </h3>
+          <Link to="/recipe/create" className="inline-flex items-center justify-center whitespace-nowrap text-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-slate-100 hover:text-accent-foreground h-9 rounded-md px-3 cursor-pointer mt-4 absolute top-0 right-4">
+            Create Recipe
+          </Link>
+          <div>
+            {displayRecipes(error, recipes, loading)}
+          </div>
         </div>
-        {displayRecipes(error, recipes)}
       </div>
     );
   };
 
-
-
+  // changed such that RecipeList only renders when profile is not being edited
   return (
     <div>
-      {!isEditing ? (profilePage(user, loggedInUserID, handleEditButtonClick)) : (profileEdit(user, handleFormSubmit, form, setIsEditing, updateForm, messageData))}
-      <RecipeList />
+      {!isEditing ? (profilePage(user, loggedInUserID, handleEditButtonClick, RecipeList)) : (profileEdit(user, handleFormSubmit, form, setIsEditing, updateForm, messageData))}
     </div>
   );
 }
 
-function profilePage(user, loggedInUserID, handleEditButtonClick) {
+function profilePage(user, loggedInUserID, handleEditButtonClick, RecipeList) {
   return (
-    <div className="border rounded-lg overflow-hidden p-4">
-      <div className="grid grid-cols-2 gap-x-8 gap-y-2 border-b border-slate-900/10 pb-12 md:grid-cols-2">
-        <div className="col-span-1 grid grid-cols-1 gap-x-8 gap-y-2">
-          <div className="flex items-center space-x-1">
-            <h3 className="text-lg font-semibold">
-              {user.name}'s Profile
-            </h3>
+    <div>
+      <div className="border rounded-lg overflow-hidden p-4 relative">
+        <div className="grid grid-cols-2 gap-x-8 gap-y-2 border-b border-slate-900/10 pb-12 md:grid-cols-2">
+          <div className="col-span-1 grid grid-cols-1 gap-x-8 gap-y-2">
+            <div className="flex items-center space-x-1">
+              <h3 className="text-lg font-semibold pb-2">
+                {user.name}'s profile
+              </h3>
+            </div>
+            <div className="flex items-center space-x-1">
+              <h2 className="text-base font-semibold leading-7 text-slate-900">
+                Username:
+              </h2>
+              <span className="text-base text-slate-900" >
+                {user.username}
+              </span>
+            </div>
+            {/* LIST RECIPE IDS (DEPRECATE LATER) */}
+            {/* <div className="flex items-center space-x-1">
+              <h2 className="text-base font-semibold leading-7 text-slate-900">
+                Recipe IDs:
+              </h2>
+              <span className="text-base text-slate-900" >
+                {user.recipe_ids}
+              </span>
+            </div> */}
           </div>
-          <div className="flex items-center space-x-1">
-            <h2 className="text-base font-semibold leading-7 text-slate-900">
-              Username:
-            </h2>
-            <span className="text-base text-slate-900" >
-              {user.username}
-            </span>
-          </div>
-          {/* LIST RECIPE IDS (DEPRECATE LATER) */}
-          <div className="flex items-center space-x-1">
-            <h2 className="text-base font-semibold leading-7 text-slate-900">
-              Recipe IDs:
-            </h2>
-            <span className="text-base text-slate-900" >
-              {user.recipe_ids}
-            </span>
-          </div>
+          {(user._id == loggedInUserID) ? (
+            <div className="text-right absolute top-0 right-4">
+              <input
+                type="button"
+                value="Edit Profile"
+                onClick={handleEditButtonClick}
+                className="inline-flex items-center justify-center whitespace-nowrap text-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-slate-100 hover:text-accent-foreground h-9 rounded-md px-3 cursor-pointer mt-4"
+              />
+            </div>
+          ) : (
+            ""
+          )}
         </div>
-        {(user._id == loggedInUserID) ? (
-          <div className="col-span-1 text-right">
-            <input
-              type="button"
-              value="Edit Profile"
-              onClick={handleEditButtonClick}
-              className="inline-flex items-center justify-center whitespace-nowrap text-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-slate-100 hover:text-accent-foreground h-9 rounded-md px-3 cursor-pointer mt-4"
-            />
-          </div>
-        ) : (
-          ""
-        )}
       </div>
+      <RecipeList />
     </div>
   )
 }
@@ -402,9 +415,13 @@ function profileEdit(user, handleFormSubmit, form, setIsEditing, updateForm, mes
 }
 
 // Separate function to display recipes or error message
-function displayRecipes(error, recipes) {
+function displayRecipes(error, recipes, loading) {
   if (error) {
     return <p style={{ color: "red" }}>Error: {error}</p>;
+  } else if (loading) {
+    return <p>Loading recipes...</p>;
+  } else if (!recipes || recipes.length === 0) {
+    return <p>No recipes found. Try creating a new one!</p>;
   }
   return (
     // <div>
@@ -419,21 +436,25 @@ function displayRecipes(error, recipes) {
     // </div>
     <div className="p-4">
       {/* Grid Container */}
-      <div className="grid grid-cols-3 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid md:grid-cols-3 gap-4 sm:grid-cols-2">
         {/* Map over items */}
         {recipes.map((recipe, index) => (
-          <div
+          <Link
             key={index}
-            className="bg-gray-50 rounded shadow-md text-center flex flex-col items-center justify-center p-4"
+            to={`/recipe/${recipe._id}`}
+            className="bg-gray-50 rounded shadow-md text-center flex flex-col items-center justify-center p-4 transition-transform transform hover:scale-105 duration-300"
           >
             {/* Image */}
-            <div className="w-full h-40 flex items-center justify-center">
-              <img src={'data:image/jpeg;base64,' + recipe.image} style={{ width: '300px', height: 'auto' }} className="max-w-full max-h-full object-contain rounded" />
+            <div className="w-full h-40 flex items-center justify-center rounded">
+              <img src={'data:image/jpeg;base64,' + recipe.image} 
+                  className="max-w-full max-h-full object-contain rounded"
+                  alt={`Recipe: ${recipe.title}`}/>
             </div>
+
             <h3 className="text-lg font-semibold mt-2">
               {recipe.title}
             </h3>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

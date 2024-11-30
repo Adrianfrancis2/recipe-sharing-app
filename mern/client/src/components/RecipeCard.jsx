@@ -112,21 +112,32 @@ function recipePage(recipe, recipeAuthor) {
             </span>
           </div>
           <div className="flex items-center space-x-1">
-            {imageSrc ? <img className="w-full py-4" src={imageSrc}></img> : ""}
+            {imageSrc ? 
+              <img className="w-full py-4 max-w-full max-h-full object-contain rounded" 
+                src={imageSrc} 
+                alt="very scrumptious image of recipe" /> 
+              : ""}
           </div>
+
           <h2 className="text-base font-semibold leading-7 text-slate-900 pt-4">
             Ingredients:
           </h2>
           <div className="grid grid-cols-2 divide-x divide-slate-300">
             <div className="pr-4">
-              <span className="text-base text-slate-900">
-                {ingredientsLeft}
-              </span>
+              {ingredientsLeft.map((ingredient, index) => (
+                <span key={index} className="text-slate-900">
+                  {ingredient}
+                  {index < ingredientsLeft.length - 1 && <br />}
+                </span>
+              ))}
             </div>
             <div className="pl-4">
-              <span className="text-base text-slate-900">
-                {ingredientsRight}
-              </span>
+              {ingredientsRight.map((ingredient, index) => (
+                <span key={index} className="text-slate-900">
+                  {ingredient}
+                  {index < ingredientsRight.length - 1 && <br />}
+                </span>
+              ))}
             </div>
           </div>
           <h2 className="text-base font-semibold leading-7 text-slate-900 pt-4">
