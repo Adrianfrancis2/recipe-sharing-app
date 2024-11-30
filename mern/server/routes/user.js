@@ -48,24 +48,6 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// //  Fetch user login
-// router.post("/", async (req, res) => {
-//   try {
-//     let loginUser = {
-//       username: req.body.username,
-//       password: req.body.password,
-//     };
-//     let collection = await db.collection("users");
-//     let findUserName = await collection.findOne({ username: newUser.username });
-//     console.log(findUserName);
-//     result = findUserName;
-//     res.status(204).send(result);
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).send({ message: "Error fetching user: no user found" });
-//   };
-// });
-
 //  Create a new user
 router.post("/", async (req, res) => {
   // console.log("post request to /user routed")
@@ -92,6 +74,41 @@ router.post("/", async (req, res) => {
     console.error(err);
     res.status(500).send("Error adding user");
   }
+});
+
+// Login user
+router.post("/login", async (req, res) => {
+  console.log("trying");
+  try {
+    let loginUser = {
+      username: req.body.username,
+      password: req.body.password,
+    };
+    console.log(loginUser);
+    let collection = await db.collection("users");
+    let findUserName = await collection.findOne({ username: loginUser.username });
+    console.log(findUserName);
+
+    if (findUserName == null) {
+      console.error("user not found");
+      res.status(400).json({ msg: "user not found" });
+    } else {
+      const isPasswordCorrect = await bcrypt.compare(loginUser.password, findUserName.password);
+      console.log(isPasswordCorrect);
+      console.log(loginUser.password);
+      console.log(findUserName.password);
+      if (!isPasswordCorrect) {
+        console.error("incorrect password");
+        res.status(400).json({ msg: "incorrect password" });
+      } else {
+        res.status(200).json({ msg: findUserName });
+      }
+    }
+  } catch (err) {
+      console.log("oopsies");
+      console.error(err);
+      res.status(500).send({ message: "Error fetching user: no user found" });
+  };
 });
 
 //  Update a record by id

@@ -47,7 +47,7 @@ export default function LoginUser({ setLogin }) {
 
     try {
       let response;
-      response = await fetch("http://localhost:5050/login", { //sends HTTP POST request to login
+      response = await fetch("http://localhost:5050/user/login", { //sends HTTP POST request to login
         method: "POST",
         headers: {
           "Content-Type": "application/json",
