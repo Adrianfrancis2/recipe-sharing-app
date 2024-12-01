@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useOutletContext, useParams } from "react-router-dom";
+import { useNavigate, useOutletContext, useParams, Link } from "react-router-dom";
 
 //RecipeCard: displays information about specific recipe 
 
@@ -114,7 +114,11 @@ function recipePage(recipe, recipeAuthor) {
             <span className="text-base text-slate-900">
               {recipeAuthor ? (
                 <>
-                  Contributed by <strong className="font-semibold">{recipeAuthor.name}</strong> (@{recipeAuthor.username})
+                  Contributed by <strong className="font-semibold">
+                    {recipeAuthor.name}
+                    </strong> (<Link to={`/user/${recipeAuthor._id}`}>
+                    @{recipeAuthor.username}
+                    </Link>)
                 </>
               ) : ("Contributer unknown")}
             </span>
