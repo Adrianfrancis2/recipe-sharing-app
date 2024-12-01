@@ -202,7 +202,7 @@ export default function CreateRecipe() {
             </p>
             <p className="mt-1 text-sm leading-6 text-slate-600">
               <strong>Instructions:</strong> {form.steps.length > 0
-              ? form.steps.map((step, index) => <li className="list-circle list-inside pl-4 py-0.5" key={index}>{step} 
+              ? form.steps.map((step, index) => <li className="list-decimal list-inside pl-4 py-0.5" key={index}>{step} 
               <button className="ml-2 bg-gray-200 rounded-md px-1" onClick={() => removeStep(step)} >Remove</button></li>)
               : "No steps added"}
             </p>
