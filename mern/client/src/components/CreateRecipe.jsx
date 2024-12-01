@@ -184,27 +184,29 @@ export default function CreateRecipe() {
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-slate-900/10 pb-12 md:grid-cols-2">
           <div>
             <h2 className="text-base font-semibold leading-7 text-slate-900">
-              Recipe Information
+              Recipe Preview
             </h2>
             <p className="mt-1 text-sm leading-6 text-slate-600">
               <strong>Title: </strong> {form.title || "Not provided"}
             </p>
             <p className="mt-1 text-sm leading-6 text-slate-600">
-              <strong>Description: </strong> {form.desc || "Not provided"}
+              <strong>Description: </strong> <br/>
+              <span> {form.desc || "Not provided"} </span>
             </p>
-            <p className="mt-1 text-sm leading-6 text-slate-600">
+            <p className="mt-1 text-sm leading-6 text-slate-600 pt-4">
               <strong>Ingredients:</strong> {form.ingredients.length > 0
-              ? form.ingredients.map((ingredient, index) => <li className="list-circle list-inside pl-4" key={index}>{ingredient} 
+              ? form.ingredients.map((ingredient, index) => 
+              <li className="list-circle list-inside pl-4 py-0.5" key={index}>{ingredient} 
               <button className="ml-2 bg-gray-200 rounded-md px-1" onClick={() => removeIngredient(ingredient)} >Remove</button></li>)
               : "No ingredients added"}
             </p>
             <p className="mt-1 text-sm leading-6 text-slate-600">
               <strong>Instructions:</strong> {form.steps.length > 0
-              ? form.steps.map((step, index) => <li className="list-circle list-inside pl-4" key={index}>{step} 
+              ? form.steps.map((step, index) => <li className="list-circle list-inside pl-4 py-0.5" key={index}>{step} 
               <button className="ml-2 bg-gray-200 rounded-md px-1" onClick={() => removeStep(step)} >Remove</button></li>)
               : "No steps added"}
             </p>
-            <p className="mt-1 text-sm leading-6 text-slate-600">
+            <p className="mt-1 text-sm leading-6 text-slate-600 pt-4">
               <strong>Image:</strong> {form.image ? <button className="ml-2 bg-gray-200 rounded-md px-1" onClick={() => removeImage()} >
                 Remove</button> : ""}
               {form.image ? <img className="max-w-40 max-h-40" src={URL.createObjectURL(form.image)}></img>: "Not provided"}
@@ -271,6 +273,14 @@ export default function CreateRecipe() {
                     placeholder="Ingredients list"
                     value={newIngredient}
                     onChange={(e) => setNewIngredient(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        if (newIngredient.trim()) {
+                          addIngredient();
+                        }
+                      }
+                    }}
                   />
                   <button type="button" onClick={addIngredient} className="ml-2 px-3 py-1 bg-indigo-600 text-white rounded-md">
                     Add 
@@ -295,6 +305,14 @@ export default function CreateRecipe() {
                     placeholder="Instructions"
                     value={newStep}
                     onChange={(e) => setNewStep(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        if (newStep.trim()) {
+                          addStep();
+                        }
+                      }
+                    }}
                   />
                   <button type="button" onClick={addStep} className="ml-2 px-3 py-1 bg-indigo-600 text-white rounded-md">
                     Add 
