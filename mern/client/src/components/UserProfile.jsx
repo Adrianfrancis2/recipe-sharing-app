@@ -213,9 +213,13 @@ export default function UserProfile() {
           <h3 className="text-lg font-semibold pb-2">
             Recipes
           </h3>
-          <Link to="/recipe/create" className="inline-flex items-center justify-center whitespace-nowrap text-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-slate-100 hover:text-accent-foreground h-9 rounded-md px-3 cursor-pointer mt-4 absolute top-0 right-4">
-            Create Recipe
-          </Link>
+          {(user._id == loggedInUserID) ? (
+            <Link to="/recipe/create" className="inline-flex items-center justify-center whitespace-nowrap text-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-slate-100 hover:text-accent-foreground h-9 rounded-md px-3 cursor-pointer mt-4 absolute top-0 right-4">
+              Create Recipe
+            </Link>
+          ) : (
+            ""
+          )}
           <div>
             {displayRecipes(error, recipes, loading)}
           </div>
