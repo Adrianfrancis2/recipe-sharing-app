@@ -171,9 +171,8 @@ function recipePage(recipe, recipeAuthor, loggedInUserID, navigate) {
     const payload = {
       //password retains the current password from user data
       password: user_obj.password,
-      recipe_ids: user_obj.recipe_ids.includes(recipe._id) ? [...user_obj.recipe_ids] : [...user_obj.recipe_ids, recipe._id],
+      saved_recipe_ids: user_obj.saved_recipe_ids.includes(recipe._id) ? [...user_obj.saved_recipe_ids] : [...user_obj.saved_recipe_ids, recipe._id],
     };
-    console.log(" Updated Recipe IDs: " + payload.recipe_ids);
     
     //perform a patch request to update user data
     let user_patch_response;
