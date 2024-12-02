@@ -211,7 +211,7 @@ export default function UserProfile() {
       <div>
         <div className="border rounded-lg overflow-hidden p-4 mt-4 relative">
           <h3 className="text-lg font-semibold pb-2">
-            Recipes
+            My Recipes
           </h3>
           {(user._id == loggedInUserID) ? (
             <Link to="/recipe/create" className="inline-flex items-center justify-center whitespace-nowrap text-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-slate-100 hover:text-accent-foreground h-9 rounded-md px-3 cursor-pointer mt-4 absolute top-0 right-4">
@@ -228,15 +228,69 @@ export default function UserProfile() {
     );
   };
 
+  // Gets recipes saved by user
+  const SavedRecipeList = () => {
+    const [recipes, setRecipes] = useState([]); // Store fetched recipes
+    const [error, setError] = useState(null);  // Store error message (if any)
+    const [loading, setLoading] = useState(true); // Store loading state
+  
+    // Function to fetch recipes
+    const fetchRecipes = async (ids) => {
+      try {
+        console.log(ids);
+        // Fetch all recipes concurrently and parse JSON responses
+        return await Promise.all(
+          ids.map((id) =>
+            fetch(`http://localhost:5050/recipe/${id}`).then((res) => {
+              if (!res.ok) throw new Error(`Failed to fetch recipe with ID: ${id}`);
+              return res.json();
+            })
+          )
+        );
+      } catch (error) {
+        console.error("Error fetching recipes:", error);
+        console.log(error);
+        throw error; // Rethrow to handle in calling code
+      }
+    };
+  
+    useEffect(() => {
+      // Fetch recipes when the component mounts
+      fetchRecipes(user.saved_recipe_ids)
+        .then((fetchedRecipes) => {  // Update state with fetched recipes
+          setRecipes(fetchedRecipes); // Update state with fetched recipes
+          setLoading(false); // Update loading state
+        })         
+        .catch((err) => { // Update error state if fetch fails
+          setError(err.message)
+          setLoading(false)
+        }); 
+    }, []); // Empty dependency array ensures this runs once on mount
+
+    // Render recipes or show error
+    return (
+      <div>
+        <div className="border rounded-lg overflow-hidden p-4 mt-4 relative">
+          <h3 className="text-lg font-semibold pb-2">
+            Saved Recipes
+          </h3>
+          <div>
+            {displayRecipes(error, recipes, loading)}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // changed such that RecipeList only renders when profile is not being edited
   return (
     <div>
-      {!isEditing ? (profilePage(user, loggedInUserID, handleEditButtonClick, RecipeList)) : (profileEdit(user, handleFormSubmit, form, setIsEditing, updateForm, messageData))}
+      {!isEditing ? (profilePage(user, loggedInUserID, handleEditButtonClick, RecipeList, SavedRecipeList)) : (profileEdit(user, handleFormSubmit, form, setIsEditing, updateForm, messageData))}
     </div>
   );
 }
 
-function profilePage(user, loggedInUserID, handleEditButtonClick, RecipeList) {
+function profilePage(user, loggedInUserID, handleEditButtonClick, RecipeList, SavedRecipeList) {
   return (
     <div>
       <div className="border rounded-lg overflow-hidden p-4 relative">
@@ -280,6 +334,7 @@ function profilePage(user, loggedInUserID, handleEditButtonClick, RecipeList) {
         </div>
       </div>
       <RecipeList />
+      {(user._id == loggedInUserID) ? (<SavedRecipeList />) : ("")}
     </div>
   )
 }
@@ -425,19 +480,9 @@ function displayRecipes(error, recipes, loading) {
   } else if (loading) {
     return <p>Loading recipes...</p>;
   } else if (!recipes || recipes.length === 0) {
-    return <p>No recipes found. Try creating a new one!</p>;
+    return <p>No recipes saved. Try saving a recipe!</p>;
   }
   return (
-    // <div>
-    //   <ul>
-    //     {recipes.map((recipe, index) => (
-    //       <div>
-    //         <li key={index}>{recipe.title}</li>
-    //         <img src={'data:image/jpeg;base64,' + recipe.image} style={{ width: '300px', height: 'auto' }} />
-    //       </div>
-    //     ))}
-    //   </ul>
-    // </div>
     <div className="p-4">
       {/* Grid Container */}
       <div className="grid md:grid-cols-3 gap-4 sm:grid-cols-2">
