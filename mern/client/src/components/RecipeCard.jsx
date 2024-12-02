@@ -75,10 +75,13 @@ export default function RecipeCard() {
     return <p>Loading recipe...</p>;
   } 
 
+  // console.log("recipeAuthor: " + recipeAuthor._id);
+  // console.log("loggedIn: " + loggedInUserID);
+
   return (
     <div>
       {/* {!isEditing ? (profilePage(user, loggedInUserID, handleEditButtonClick)) : (profileEdit(user, handleFormSubmit, form, setIsEditing, updateForm, messageData))} */}
-      {recipePage(recipe, recipeAuthor)}
+      {recipePage(recipe, recipeAuthor, loggedInUserID, navigate)}
     </div>
   );
 }
@@ -86,7 +89,7 @@ export default function RecipeCard() {
 
 //display detailed informationa bout recipe 
   //author, ingredients, steps, image etc
-function recipePage(recipe, recipeAuthor) {
+function recipePage(recipe, recipeAuthor, loggedInUserID, navigate) {
   const authorLine = recipeAuthor ? `Contributed by ${recipeAuthor.name} (@${recipeAuthor.username})` : "Contributer unknown"; //creates string with author's name & username
   const imageSrc = (recipe.image) ? (`data:image/jpeg;base64,${recipe.image}`) : null; //converts image data into a data URI
   const ingredients = JSON.parse(recipe.ingredients);
@@ -94,6 +97,51 @@ function recipePage(recipe, recipeAuthor) {
   const ingredientsRight = ingredients.slice(Math.ceil(ingredients.length / 2), ingredients.length);
   const steps = JSON.parse(recipe.steps); //convert JSON string into array of steps used to dispaly recipe instructions
 
+  async function deleteRecipe(recipe, recipeAuthor, navigate) {
+    try {
+      const response = await fetch(`http://localhost:5050/recipe/${recipe._id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (response.ok) {
+        const result = await response.json();
+        const userPayload = {
+          password: recipeAuthor.password,
+          recipe_ids: recipeAuthor.recipe_ids.filter(id => id !== recipe._id),
+        };
+        try {
+          const response = await fetch(`http://localhost:5050/user/${recipeAuthor._id}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(userPayload),
+          });
+          if (response.ok) {
+            const userResult = await response.json();
+            console.log("Recipe deleted successfully:", result);
+            alert("Recipe deleted successfully!");
+            navigate("/user/profile");
+          } else {
+            console.error("Failed to update user:", await response.text());
+            alert("Failed to delete recipe. Please try again.");
+          };
+        } catch (error) {
+          console.error("Failed to update user:", await response.text());
+        }
+      } else {
+        console.error("Failed to delete recipe:", await response.text());
+        alert("Failed to delete recipe. Please try again.");
+      }
+    } catch (err) {
+      console.error("Error during deletion:", err);
+      alert("An error occurred while deleting the recipe. Please try again.");
+    }
+  }
+  
 
   //display
   return (
@@ -161,6 +209,18 @@ function recipePage(recipe, recipeAuthor) {
                 <li key={index} className="text-slate-900">{step}</li>
               ))}
             </span>
+          </div>
+          <div className="pt-4 flex justify-end">
+            {recipeAuthor && loggedInUserID == recipeAuthor._id ? (
+              <button className="inline-flex justify-center items-center col-span-1 whitespace-nowrap text-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-red-400 bg-red-400 text-white hover:bg-red-600 h-9 rounded-md p-4" 
+              onClick={() => {
+                if (window.confirm('Are you sure you want to delete this recipe? This action cannot be undone.')) {
+                  deleteRecipe(recipe, recipeAuthor, navigate);
+                }
+              }}>
+                Delete
+              </button>) 
+              : ("")}
           </div>
         </div>
       </div>
