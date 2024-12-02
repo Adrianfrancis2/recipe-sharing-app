@@ -275,7 +275,7 @@ export default function UserProfile() {
             Saved Recipes
           </h3>
           <div>
-            {displayRecipes(error, recipes, loading)}
+            {displaySavedRecipes(error, recipes, loading)}
           </div>
         </div>
       </div>
@@ -475,6 +475,43 @@ function profileEdit(user, handleFormSubmit, form, setIsEditing, updateForm, mes
 
 // Separate function to display recipes or error message
 function displayRecipes(error, recipes, loading) {
+  if (error) {
+    return <p style={{ color: "red" }}>Error: {error}</p>;
+  } else if (loading) {
+    return <p>Loading recipes...</p>;
+  } else if (!recipes || recipes.length === 0) {
+    return <p>No recipes found. Try creating a recipe!</p>;
+  }
+  return (
+    <div className="p-4">
+      {/* Grid Container */}
+      <div className="grid md:grid-cols-3 gap-4 sm:grid-cols-2">
+        {/* Map over items */}
+        {recipes.map((recipe, index) => (
+          <Link
+            key={index}
+            to={`/recipe/${recipe._id}`}
+            className="bg-gray-50 rounded shadow-md text-center flex flex-col items-center justify-center p-4 transition-transform transform hover:scale-105 duration-300"
+          >
+            {/* Image */}
+            <div className="w-full h-40 flex items-center justify-center rounded">
+              <img src={'data:image/jpeg;base64,' + recipe.image} 
+                  className="max-w-full max-h-full object-contain rounded"
+                  alt={`Recipe: ${recipe.title}`}/>
+            </div>
+
+            <h3 className="text-lg font-semibold mt-2">
+              {recipe.title}
+            </h3>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Separate function to display recipes or error message
+function displaySavedRecipes(error, recipes, loading) {
   if (error) {
     return <p style={{ color: "red" }}>Error: {error}</p>;
   } else if (loading) {
