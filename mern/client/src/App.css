@@ -1,16 +1,17 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  max-width: 1280px; /*set maximum width */
+  margin: 0 auto; /*centers horizontally*/
+  padding: 2rem; /*adds padding */
+  text-align: center; /*aligns text and child elements to center */
 }
 
 .logo {
-  height: 6em;
+  height: 6em; 
   padding: 1.5em;
   will-change: filter;
-  transition: filter 300ms;
+  transition: filter 300ms; /*time it takes to transition changes in 'filter' */
 }
+/*hoover element to logo (shadow) */
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
@@ -20,27 +21,30 @@
 
 @keyframes logo-spin {
   from {
-    transform: rotate(0deg);
+    transform: rotate(0deg); /*start with no rotation */
   }
   to {
-    transform: rotate(360deg);
+    transform: rotate(360deg); /*complete rotation */
   }
 }
 
+/*spinning annimation on a condition*/
 @media (prefers-reduced-motion: no-preference) {
   a:nth-of-type(2) .logo {
     animation: logo-spin infinite 20s linear;
   }
 }
 
+/*stylying with class "card" */
 .card {
   padding: 2em;
 }
 
-.read-the-docs {
-  color: #888;
+.read-the-docs { 
+  color: #888; /*gray colored text  */
 }
 
+/*main styling for banner */
 .centered-banner {
   display: flex;
   justify-content: center;  /* Horizontally center */

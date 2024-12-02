@@ -1,9 +1,7 @@
 import { MongoClient, ServerApiVersion } from "mongodb";
 
-// adding comments
-// Hi Noosha
-
 const uri = process.env.ATLAS_URI || "";
+//create new MongoClient instance
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -24,6 +22,8 @@ try {
   console.error(err);
 }
 
+//set up reference to "recipe-sharing" database 
 let db = client.db("recipe-sharing");
 
+//export database instance for use in other files
 export default db;
