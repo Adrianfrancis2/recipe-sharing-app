@@ -202,7 +202,6 @@ function recipePage(recipe, recipeAuthor, loggedInUserID, user_obj, navigate, sa
       password: user_obj.password,
       saved_recipe_ids: user_obj.saved_recipe_ids.filter(id => id !== recipe._id),
     };
-    console.log(" Updated Recipe IDs: " + payload.saved_recipe_ids);
     
     //perform a patch request to update user data
     let user_patch_response;
