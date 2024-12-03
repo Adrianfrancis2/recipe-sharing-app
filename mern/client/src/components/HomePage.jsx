@@ -16,6 +16,7 @@ function loggedInHomePage (displayRecipes) {
   const [recipes, setRecipes] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { searchTerm, parseSearchTerm } = useOutletContext();
 
   useEffect(() => {
     // get all recipes
@@ -27,15 +28,42 @@ function loggedInHomePage (displayRecipes) {
         return response.json();
       })
       .then(data => {
-        setRecipes(data);
-        setLoading(false);
-      })
+        let filteredData = data;
+        if (searchTerm != "") {
+          const parsedSearchTerms = parseSearchTerm(searchTerm);
+          filteredData = data.filter(recipe => {
+            return parsedSearchTerms.every(term => {
+              // Convert ingredients and steps from strings to arrays
+              const ingredients = JSON.parse(recipe.ingredients || "[]");
+              const steps = JSON.parse(recipe.steps || "[]");
+              // Check if the term matches the title, desc, ingredients, or steps
+              return (
+                recipe.title?.toLowerCase().includes(term) ||
+                recipe.desc?.toLowerCase().includes(term) ||
+                ingredients.some(ingredient => ingredient.toLowerCase().includes(term)) ||
+                steps.some(step => step.toLowerCase().includes(term))
+              );
+            });
+          });
+          if (filteredData.length === 0) {
+            setRecipes("search failed");
+            setLoading(false);
+          } else {
+            setRecipes(filteredData);
+            setLoading(false);
+          }
+        } else {
+          setRecipes(data);
+          setLoading(false);
+        }
+
+        })
       .catch(error => {
         console.error('Error fetching recipes:', error)
         setError(error.message);
         setLoading(false);
       });
-  }, []);
+  }, [searchTerm]);
 
   return (
     <div>
@@ -50,7 +78,10 @@ function displayRecipes(error, recipes, loading) {
     return <p style={{ color: "red" }}>Error: {error}</p>;
   } else if (loading) {
     return <p>Loading recipes...</p>;
-  } else if (!recipes || recipes.length === 0) {
+  } else if (recipes === "search failed") {
+    return <p>No recipes found. Try searching something different!</p>;
+  }
+  else if (!recipes || recipes.length === 0) {
     return <p>No recipes found. Try creating a new one!</p>;
   }
   return (

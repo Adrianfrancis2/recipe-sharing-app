@@ -23,7 +23,7 @@ const App = () => {
   const [isEditing, setIsEditing] = useState(false);
 
   // state to hold search terms
-  const [searchTerm, setSearchTerm] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // check current location
   const location = useLocation();
@@ -43,14 +43,12 @@ const App = () => {
     setSearchTerm(term);
   };
 
-  const parsedSearchTerms = parseSearchTerm(searchTerm);
-
   // pass in log in user ID to Navbar & log out 
   // update userID
   return (
     <div className="w-full p-6">
       <Navbar loggedIn={loggedInUserID} logout={handleLogout} isEditing={isEditing} onSearch={handleSearch} searchTerm={searchTerm} /> 
-      <Outlet context={{ loggedInUserID: loggedInUserID, setLoggedInUserID: setLoggedInUserID, isEditing, setIsEditing, searchTerm: parsedSearchTerms }} />
+      <Outlet context={{ loggedInUserID: loggedInUserID, setLoggedInUserID: setLoggedInUserID, isEditing, setIsEditing, searchTerm, parseSearchTerm }} />
     </div>
   );
 };
