@@ -1,6 +1,6 @@
 import { NavLink, useLocation } from "react-router-dom";
 
-export default function Navbar({ loggedIn, logout }) {
+export default function Navbar({ loggedIn, logout, isEditing }) {
 
   const location = useLocation()
   //banner at top --> link to home page 
@@ -20,6 +20,17 @@ export default function Navbar({ loggedIn, logout }) {
             className="py-1 px-1 text-6xl font-bold bg-gradient-to-r from-blue-800 via-indigo-700 to-blue-500 text-transparent bg-clip-text hover:from-blue-900 hover:via-indigo-800 hover:to-blue-600" style={{ fontFamily: 'Pacifico, cursive'}}>
              {/* empty logo to shift buttons to the right */}&nbsp;
           </div>
+         )}
+         {/* check if logged in --> display searchbar*/}
+         {loggedIn && !(location.pathname.startsWith("/recipe/") || location.pathname === "/recipe/create") && (
+        <div className="flex justify-center items-center w-full sm:w-3/4 md:w-1/2">
+          <input
+            type="text"
+            placeholder="Search recipes..."
+            className="border border-input bg-background hover:bg-slate-100 h-12 rounded-md px-4 w-full transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 text-center"
+            onChange={(e) => onSearch(e.target.value)} // Optional: Pass the search term back to parent
+          />
+        </div>
          )}
         {loggedIn ? (LoggedInNavBar(loggedIn, logout)) : (guestNavBar())}
       </nav>
