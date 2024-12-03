@@ -1,8 +1,16 @@
+import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 
-export default function Navbar({ loggedIn, logout, isEditing }) {
+export default function Navbar({ loggedIn, logout, isEditing, onSearch }) {
 
   const location = useLocation()
+  const [searchInput, setSearchInput] = useState("");
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    setSearchInput(value);
+    onSearch(value); // update search term in App.jsx
+  }
   //banner at top --> link to home page 
   return (
     <div>
@@ -28,7 +36,7 @@ export default function Navbar({ loggedIn, logout, isEditing }) {
             type="text"
             placeholder="Search recipes..."
             className="border border-input bg-background hover:bg-slate-100 h-12 rounded-md px-4 w-full transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 text-center"
-            onChange={(e) => onSearch(e.target.value)} // Optional: Pass the search term back to parent
+            onChange={handleChange}
           />
         </div>
          )}
