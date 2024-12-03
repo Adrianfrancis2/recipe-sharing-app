@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 
 export default function Navbar({ loggedIn, logout, isEditing, onSearch, searchTerm }) {
@@ -6,10 +6,16 @@ export default function Navbar({ loggedIn, logout, isEditing, onSearch, searchTe
   const [searchInput, setSearchInput] = useState("");
   const timeoutRef = useRef(null);
 
+  useEffect(() => {
+    // reset the searchbar when the route changes
+    setSearchInput("");
+  }, [location, isEditing]);
+
   const handleChange = (e) => {
     const value = e.target.value;
     setSearchInput(value);
 
+    // SEARCH DEBOUNCING
     // clear previous timeout
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -17,7 +23,7 @@ export default function Navbar({ loggedIn, logout, isEditing, onSearch, searchTe
     // set a new timeout to update the search term after a delay
     timeoutRef.current = setTimeout(() => {
       onSearch(value);
-    }, 250); // in ms
+    }, 300); // in ms
   };
   //banner at top --> link to home page 
   return (
