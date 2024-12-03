@@ -9,6 +9,7 @@ export default function UserProfile() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
+  const { searchTerm, parseSearchTerm } = useOutletContext();
   // const [isEditing, setIsEditing] = useState(false); // deprecated as lifted to App.jsx
   const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;   // regex pattern for password validation
 
@@ -207,14 +208,40 @@ export default function UserProfile() {
       // Fetch recipes when the component mounts
       fetchRecipes(user.recipe_ids)
         .then((fetchedRecipes) => {  // Update state with fetched recipes
-          setRecipes(fetchedRecipes); // Update state with fetched recipes
-          setLoading(false); // Update loading state
+          let filteredData = fetchedRecipes;
+          if (searchTerm != "") {
+            const parsedSearchTerms = parseSearchTerm(searchTerm);
+            filteredData = fetchedRecipes.filter(recipe => {
+              return parsedSearchTerms.every(term => {
+                // Convert ingredients and steps from strings to arrays
+                const ingredients = JSON.parse(recipe.ingredients || "[]");
+                const steps = JSON.parse(recipe.steps || "[]");
+                // Check if the term matches the title, desc, ingredients, or steps
+                return (
+                  recipe.title?.toLowerCase().includes(term) ||
+                  recipe.desc?.toLowerCase().includes(term) ||
+                  ingredients.some(ingredient => ingredient.toLowerCase().includes(term)) ||
+                  steps.some(step => step.toLowerCase().includes(term))
+                );
+              });
+            });
+            if (filteredData.length === 0) {
+              setRecipes("search failed");
+              setLoading(false);
+            } else {
+              setRecipes(filteredData);
+              setLoading(false);
+            }
+          } else {
+            setRecipes(fetchedRecipes); // Update state with fetched recipes
+            setLoading(false); // Update loading state
+          }
         })         
         .catch((err) => { // Update error state if fetch fails
           setError(err.message)
           setLoading(false)
         }); 
-    }, []); // Empty dependency array ensures this runs once on mount
+    }, [searchTerm]); // Runs each time searchTerm changes
 
     // Render recipes or show error
     return (
@@ -267,15 +294,41 @@ export default function UserProfile() {
     useEffect(() => {
       // Fetch recipes when the component mounts
       fetchRecipes(user.saved_recipe_ids)
-        .then((fetchedRecipes) => {  // Update state with fetched recipes
+      .then((fetchedRecipes) => {  // Update state with fetched recipes
+        let filteredData = fetchedRecipes;
+        if (searchTerm != "") {
+          const parsedSearchTerms = parseSearchTerm(searchTerm);
+          filteredData = fetchedRecipes.filter(recipe => {
+            return parsedSearchTerms.every(term => {
+              // Convert ingredients and steps from strings to arrays
+              const ingredients = JSON.parse(recipe.ingredients || "[]");
+              const steps = JSON.parse(recipe.steps || "[]");
+              // Check if the term matches the title, desc, ingredients, or steps
+              return (
+                recipe.title?.toLowerCase().includes(term) ||
+                recipe.desc?.toLowerCase().includes(term) ||
+                ingredients.some(ingredient => ingredient.toLowerCase().includes(term)) ||
+                steps.some(step => step.toLowerCase().includes(term))
+              );
+            });
+          });
+          if (filteredData.length === 0) {
+            setRecipes("search failed");
+            setLoading(false);
+          } else {
+            setRecipes(filteredData);
+            setLoading(false);
+          }
+        } else {
           setRecipes(fetchedRecipes); // Update state with fetched recipes
           setLoading(false); // Update loading state
-        })         
-        .catch((err) => { // Update error state if fetch fails
-          setError(err.message)
-          setLoading(false)
-        }); 
-    }, []); // Empty dependency array ensures this runs once on mount
+        }
+      })         
+      .catch((err) => { // Update error state if fetch fails
+        setError(err.message)
+        setLoading(false)
+      }); 
+  }, [searchTerm]); // Runs each time searchTerm changes
 
     // Render recipes or show error
     return (
@@ -489,8 +542,10 @@ function displayRecipes(error, recipes, loading) {
     return <p style={{ color: "red" }}>Error: {error}</p>;
   } else if (loading) {
     return <p>Loading recipes...</p>;
+  } else if (recipes === "search failed") {
+    return <p>No recipes found. Try searching something different!</p>;
   } else if (!recipes || recipes.length === 0) {
-    return <p>No recipes found. Try creating a recipe!</p>;
+    return <p>No recipes found. Try creating a new one!</p>;
   }
   return (
     <div className="p-4">
@@ -526,8 +581,10 @@ function displaySavedRecipes(error, recipes, loading) {
     return <p style={{ color: "red" }}>Error: {error}</p>;
   } else if (loading) {
     return <p>Loading recipes...</p>;
+  } else if (recipes === "search failed") {
+    return <p>No recipes found. Try searching something different!</p>;
   } else if (!recipes || recipes.length === 0) {
-    return <p>No recipes saved. Try saving a recipe!</p>;
+    return <p>No recipes found. Try creating a new one!</p>;
   }
   return (
     <div className="p-4">

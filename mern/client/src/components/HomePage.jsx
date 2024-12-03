@@ -80,8 +80,7 @@ function displayRecipes(error, recipes, loading) {
     return <p>Loading recipes...</p>;
   } else if (recipes === "search failed") {
     return <p>No recipes found. Try searching something different!</p>;
-  }
-  else if (!recipes || recipes.length === 0) {
+  } else if (!recipes || recipes.length === 0) {
     return <p>No recipes found. Try creating a new one!</p>;
   }
   return (
