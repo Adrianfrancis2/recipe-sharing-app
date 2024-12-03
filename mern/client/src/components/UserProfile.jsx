@@ -158,6 +158,16 @@ export default function UserProfile() {
       .catch(error => console.error('Error fetching user:', error));
   }, [loggedInUserID, profilePageID, navigate]);
 
+  // Cleanup useEffect to reset isEditing when navigating away
+  useEffect(() => {
+    return () => {
+      if (isEditing) {
+        setIsEditing(false);
+        console.log("isEditing reset to false on unmount");
+      }
+    };
+  }, [isEditing, setIsEditing]);
+
   if (error) {
     return <p>Error: {error}</p>;
   }
