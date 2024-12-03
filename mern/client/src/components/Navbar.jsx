@@ -1,16 +1,24 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 
 export default function Navbar({ loggedIn, logout, isEditing, onSearch, searchTerm }) {
-
   const location = useLocation()
   const [searchInput, setSearchInput] = useState("");
+  const timeoutRef = useRef(null);
 
   const handleChange = (e) => {
     const value = e.target.value;
     setSearchInput(value);
-    onSearch(value); // update search term in App.jsx
-  }
+
+    // clear previous timeout
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    // set a new timeout to update the search term after a delay
+    timeoutRef.current = setTimeout(() => {
+      onSearch(value);
+    }, 250); // in ms
+  };
   //banner at top --> link to home page 
   return (
     <div>
@@ -36,7 +44,7 @@ export default function Navbar({ loggedIn, logout, isEditing, onSearch, searchTe
             type="text"
             placeholder="Search recipes..."
             className="border border-input bg-background hover:bg-slate-100 h-12 rounded-md px-4 w-full transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 text-center"
-            value={searchTerm}
+            value={searchInput}
             onChange={handleChange}
           />
         </div>
