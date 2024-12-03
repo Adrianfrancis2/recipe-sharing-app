@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 
-export default function Navbar({ loggedIn, logout, isEditing, onSearch }) {
+export default function Navbar({ loggedIn, logout, isEditing, onSearch, searchTerm }) {
 
   const location = useLocation()
   const [searchInput, setSearchInput] = useState("");
@@ -36,6 +36,7 @@ export default function Navbar({ loggedIn, logout, isEditing, onSearch }) {
             type="text"
             placeholder="Search recipes..."
             className="border border-input bg-background hover:bg-slate-100 h-12 rounded-md px-4 w-full transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 text-center"
+            value={searchTerm}
             onChange={handleChange}
           />
         </div>

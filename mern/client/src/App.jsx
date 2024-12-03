@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Outlet } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 
 // clean whitespaces to create array of keywords
@@ -25,6 +25,14 @@ const App = () => {
   // state to hold search terms
   const [searchTerm, setSearchTerm] = useState([]);
 
+  // check current location
+  const location = useLocation();
+
+  useEffect(() => {
+    // reset the search term when the route changes
+    setSearchTerm("");
+  }, [location, isEditing]);
+
   //handle user logout
   const handleLogout = () => {
     localStorage.removeItem("userID"); //remove user ID from localStorage
@@ -40,7 +48,7 @@ const App = () => {
   // update userID
   return (
     <div className="w-full p-6">
-      <Navbar loggedIn={loggedInUserID} logout={handleLogout} isEditing={isEditing} onSearch={handleSearch} /> 
+      <Navbar loggedIn={loggedInUserID} logout={handleLogout} isEditing={isEditing} onSearch={handleSearch} searchTerm={searchTerm} /> 
       <Outlet context={{ loggedInUserID: loggedInUserID, setLoggedInUserID: setLoggedInUserID, isEditing, setIsEditing, searchTerm }} />
     </div>
   );
