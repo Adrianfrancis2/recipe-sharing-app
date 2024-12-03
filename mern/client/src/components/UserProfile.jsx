@@ -4,12 +4,12 @@ import { useNavigate, useOutletContext, useParams, Link } from "react-router-dom
 
 export default function UserProfile() {
   const [messageData, setMessageData] = useState("");
-  const { loggedInUserID: loggedInUserID } = useOutletContext();
+  const { loggedInUserID: loggedInUserID, isEditing, setIsEditing } = useOutletContext();
   const { id: profilePageID } = useParams();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
-  const [isEditing, setIsEditing] = useState(false); // State to toggle form visibility
+  // const [isEditing, setIsEditing] = useState(false); // deprecated as lifted to App.jsx
   const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;   // regex pattern for password validation
 
   const [form, setForm] = useState({

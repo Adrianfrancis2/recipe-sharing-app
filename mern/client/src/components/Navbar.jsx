@@ -22,7 +22,7 @@ export default function Navbar({ loggedIn, logout, isEditing }) {
           </div>
          )}
          {/* check if logged in --> display searchbar*/}
-         {loggedIn && !(location.pathname.startsWith("/recipe/") || location.pathname === "/recipe/create") && (
+         {loggedIn && !(location.pathname.startsWith("/recipe/") || location.pathname === "/recipe/create" || isEditing ) && (
         <div className="flex justify-center items-center w-full sm:w-3/4 md:w-1/2">
           <input
             type="text"
