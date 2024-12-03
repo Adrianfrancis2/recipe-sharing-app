@@ -2,6 +2,19 @@ import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Navbar from "./components/Navbar";
 
+// clean whitespaces to create array of keywords
+function parseSearchTerm(searchTerm) {
+  if (!searchTerm || typeof searchTerm !== "string") {
+    return [];
+  }
+
+  return searchTerm
+    .trim()
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(word => word.length > 0);
+}
+
 const App = () => {
   //initialize state to hold loggedin user's ID
   const [loggedInUserID, setLoggedInUserID] = useState( (localStorage.getItem("userID")) ? localStorage.getItem("userID") : null);
@@ -10,7 +23,7 @@ const App = () => {
   const [isEditing, setIsEditing] = useState(false);
 
   // state to hold search terms
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState([]);
 
   //handle user logout
   const handleLogout = () => {
@@ -19,7 +32,8 @@ const App = () => {
   };
 
   const handleSearch = (term) => {
-    setSearchTerm(term);
+    const parsedTerms = parseSearchTerm(term);
+    setSearchTerm(parsedTerms);
   };
 
   // pass in log in user ID to Navbar & log out 
