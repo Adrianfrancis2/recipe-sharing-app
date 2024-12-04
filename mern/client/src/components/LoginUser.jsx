@@ -142,7 +142,7 @@ export default function LoginUser({ setLogin }) {
                   />
                 </div>
               </div>
-              {messageData == "incorrect password" ? <div className="text-sm text-red-600">Password is Incorrect.</div> : ""}
+              {messageData == "incorrect password" ? <div className="text-sm text-red-600">Password is incorrect.</div> : ""}
             </div>
             
           </div>

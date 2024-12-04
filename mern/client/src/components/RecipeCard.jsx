@@ -10,8 +10,11 @@ export default function RecipeCard() {
   const navigate = useNavigate();
   const [recipe, setRecipe] = useState(null);
   const [recipeAuthor, setRecipeAuthor] = useState(null);
+  const [user_obj, setUser] = useState(null);
   const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false); // TODO: add functionality to copy/edit recipes?
+  
+  const [saved, setSaved] = useState(null);
 
   useEffect(() => {
     if (!loggedInUserID) {
@@ -47,9 +50,26 @@ export default function RecipeCard() {
       .catch(error => console.error('Error fetching recipe author:', error));
     }
 
+    // get logged in user
+    fetch(`http://localhost:5050/user/${loggedInUserID}`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to fetch user: ' + response.statusText);
+      }
+      return response.json();
+    })
+    .then(data => {
+      setUser(data);
+      setSaved(user_obj.saved_recipe_ids.includes(recipe._id));
+    })
+    .catch(error => console.error('Error fetching user:', error));
+
   }, [loggedInUserID, recipeID, navigate]);
 
   useEffect(() => {
+    if (user_obj) {
+      setSaved(user_obj.saved_recipe_ids.includes(recipe._id));
+    }
     if (recipe && recipe.userid) { //checks object is not null or undefined
       //get recipe author (with userid)
       fetch(`http://localhost:5050/user/${recipe.userid}`) //construct URL using userid and recipe
@@ -74,11 +94,13 @@ export default function RecipeCard() {
   if (!recipe) {
     return <p>Loading recipe...</p>;
   } 
+  // console.log("recipeAuthor: " + recipeAuthor._id);
+  // console.log("loggedIn: " + loggedInUserID);
 
   return (
     <div>
       {/* {!isEditing ? (profilePage(user, loggedInUserID, handleEditButtonClick)) : (profileEdit(user, handleFormSubmit, form, setIsEditing, updateForm, messageData))} */}
-      {recipePage(recipe, recipeAuthor)}
+      {recipePage(recipe, recipeAuthor, loggedInUserID, user_obj, navigate, saved, setSaved)}
     </div>
   );
 }
@@ -86,15 +108,123 @@ export default function RecipeCard() {
 
 //display detailed informationa bout recipe 
   //author, ingredients, steps, image etc
-function recipePage(recipe, recipeAuthor) {
-  const authorLine = recipeAuthor ? `Contributed by ${recipeAuthor.name} (@${recipeAuthor.username})` : "Contributer unknown"; //creates string with author's name & username
+function recipePage(recipe, recipeAuthor, loggedInUserID, user_obj, navigate, saved, setSaved) {
   const imageSrc = (recipe.image) ? (`data:image/jpeg;base64,${recipe.image}`) : null; //converts image data into a data URI
   const ingredients = JSON.parse(recipe.ingredients);
   const ingredientsLeft = ingredients.slice(0, Math.ceil(ingredients.length / 2));
   const ingredientsRight = ingredients.slice(Math.ceil(ingredients.length / 2), ingredients.length);
   const steps = JSON.parse(recipe.steps); //convert JSON string into array of steps used to dispaly recipe instructions
 
+  async function deleteRecipe(recipe, recipeAuthor, navigate) {
+    try {
+      const response = await fetch(`http://localhost:5050/recipe/${recipe._id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (response.ok) {
+        const result = await response.json();
+        const userPayload = {
+          password: recipeAuthor.password,
+          recipe_ids: recipeAuthor.recipe_ids.filter(id => id !== recipe._id),
+        };
+        try {
+          const response = await fetch(`http://localhost:5050/user/${recipeAuthor._id}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(userPayload),
+          });
+          if (response.ok) {
+            const userResult = await response.json();
+            console.log("Recipe deleted successfully:", result);
+            alert("Recipe deleted successfully!");
+            navigate("/user/profile");
+          } else {
+            console.error("Failed to update user:", await response.text());
+            alert("Failed to delete recipe. Please try again.");
+          };
+        } catch (error) {
+          console.error("Failed to update user:", await response.text());
+        }
+      } else {
+        console.error("Failed to delete recipe:", await response.text());
+        alert("Failed to delete recipe. Please try again.");
+      }
+    } catch (err) {
+      console.error("Error during deletion:", err);
+      alert("An error occurred while deleting the recipe. Please try again.");
+    }
+  }
 
+  async function saveRecipe(recipe, user_obj) {
+    const user_url = "http://localhost:5050/user/" + loggedInUserID;
+
+    //prepare payload for updating user data
+    const payload = {
+      //password retains the current password from user data
+      password: user_obj.password,
+      saved_recipe_ids: user_obj.saved_recipe_ids.includes(recipe._id) ? [...user_obj.saved_recipe_ids] : [...user_obj.saved_recipe_ids, recipe._id],
+    };
+    console.log(" Updated Recipe IDs: " + payload.saved_recipe_ids);
+    
+    //perform a patch request to update user data
+    let user_patch_response;
+
+    try {
+      user_patch_response = await fetch(user_url, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        //converts payload aboject into JSON string 
+        body: JSON.stringify(payload),
+      });
+      if (!user_patch_response.ok) {
+        throw new Error(`HTTP error! status: ${user_patch_response.status}`); //throw error with HTTP status code 
+      } else {
+        console.log("user data patched");
+        setSaved(true);
+      };
+    } catch (error) {
+      console.error('A problem occured with your third fetch operation: ', error);
+    }
+  }
+  
+  async function unsaveRecipe(recipe, user_obj) {
+    const user_url = "http://localhost:5050/user/" + loggedInUserID;
+    //prepare payload for updating user data
+    const payload = {
+      //password retains the current password from user data
+      password: user_obj.password,
+      saved_recipe_ids: user_obj.saved_recipe_ids.filter(id => id !== recipe._id),
+    };
+    
+    //perform a patch request to update user data
+    let user_patch_response;
+
+    try {
+      user_patch_response = await fetch(user_url, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        //converts payload aboject into JSON string 
+        body: JSON.stringify(payload),
+      });
+      if (!user_patch_response.ok) {
+        throw new Error(`HTTP error! status: ${user_patch_response.status}`); //throw error with HTTP status code 
+      } else {
+        console.log("user data patched");
+        setSaved(false);
+      };
+    } catch (error) {
+      console.error('A problem occured with your third fetch operation: ', error);
+    }
+  }
   //display
   return (
     <div className="flex justify-center min-h-full items-center">
@@ -161,6 +291,32 @@ function recipePage(recipe, recipeAuthor) {
                 <li key={index} className="text-slate-900">{step}</li>
               ))}
             </span>
+          </div>
+          <div className="pt-4 flex justify-end">
+            {recipeAuthor && loggedInUserID == recipeAuthor._id ? (
+              <button className="inline-flex justify-center items-center col-span-1 whitespace-nowrap text-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-red-400 bg-red-400 text-white hover:bg-red-600 h-9 rounded-md p-4" 
+              onClick={() => {
+                if (window.confirm('Are you sure you want to delete this recipe? This action cannot be undone.')) {
+                  deleteRecipe(recipe, recipeAuthor, navigate);
+                }
+              }}>
+                Delete
+              </button>) 
+              : ( 
+                <>
+                  {!saved ? (
+                    <button className="inline-flex justify-center items-center col-span-1 whitespace-nowrap text-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-blue-400 bg-blue-400 text-white hover:bg-blue-600 h-9 rounded-md p-4" 
+                      onClick={() => saveRecipe(recipe, user_obj)}>
+                      Save
+                    </button> 
+                    ) : (
+                    <button className="inline-flex justify-center items-center col-span-1 whitespace-nowrap text-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-blue-400 bg-blue-400 text-white hover:bg-blue-600 h-9 rounded-md p-4" 
+                      onClick={() => unsaveRecipe(recipe, user_obj)}>
+                      Unsave
+                    </button>
+                    )}
+                </>
+              )}
           </div>
         </div>
       </div>

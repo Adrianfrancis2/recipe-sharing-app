@@ -4,12 +4,13 @@ import { useNavigate, useOutletContext, useParams, Link } from "react-router-dom
 
 export default function UserProfile() {
   const [messageData, setMessageData] = useState("");
-  const { loggedInUserID: loggedInUserID } = useOutletContext();
+  const { loggedInUserID: loggedInUserID, isEditing, setIsEditing } = useOutletContext();
   const { id: profilePageID } = useParams();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
-  const [isEditing, setIsEditing] = useState(false); // State to toggle form visibility
+  const { searchTerm, parseSearchTerm } = useOutletContext();
+  // const [isEditing, setIsEditing] = useState(false); // deprecated as lifted to App.jsx
   const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;   // regex pattern for password validation
 
   const [form, setForm] = useState({
@@ -158,6 +159,16 @@ export default function UserProfile() {
       .catch(error => console.error('Error fetching user:', error));
   }, [loggedInUserID, profilePageID, navigate]);
 
+  // Cleanup useEffect to reset isEditing when navigating away
+  useEffect(() => {
+    return () => {
+      if (isEditing) {
+        setIsEditing(false);
+        console.log("isEditing reset to false on unmount");
+      }
+    };
+  }, [isEditing, setIsEditing]);
+
   if (error) {
     return <p>Error: {error}</p>;
   }
@@ -197,21 +208,47 @@ export default function UserProfile() {
       // Fetch recipes when the component mounts
       fetchRecipes(user.recipe_ids)
         .then((fetchedRecipes) => {  // Update state with fetched recipes
-          setRecipes(fetchedRecipes); // Update state with fetched recipes
-          setLoading(false); // Update loading state
+          let filteredData = fetchedRecipes;
+          if (searchTerm != "") {
+            const parsedSearchTerms = parseSearchTerm(searchTerm);
+            filteredData = fetchedRecipes.filter(recipe => {
+              return parsedSearchTerms.every(term => {
+                // Convert ingredients and steps from strings to arrays
+                const ingredients = JSON.parse(recipe.ingredients || "[]");
+                const steps = JSON.parse(recipe.steps || "[]");
+                // Check if the term matches the title, desc, ingredients, or steps
+                return (
+                  recipe.title?.toLowerCase().includes(term) ||
+                  recipe.desc?.toLowerCase().includes(term) ||
+                  ingredients.some(ingredient => ingredient.toLowerCase().includes(term)) ||
+                  steps.some(step => step.toLowerCase().includes(term))
+                );
+              });
+            });
+            if (filteredData.length === 0) {
+              setRecipes("search failed");
+              setLoading(false);
+            } else {
+              setRecipes(filteredData);
+              setLoading(false);
+            }
+          } else {
+            setRecipes(fetchedRecipes); // Update state with fetched recipes
+            setLoading(false); // Update loading state
+          }
         })         
         .catch((err) => { // Update error state if fetch fails
           setError(err.message)
           setLoading(false)
         }); 
-    }, []); // Empty dependency array ensures this runs once on mount
+    }, [searchTerm]); // Runs each time searchTerm changes
 
     // Render recipes or show error
     return (
       <div>
         <div className="border rounded-lg overflow-hidden p-4 mt-4 relative">
           <h3 className="text-lg font-semibold pb-2">
-            Recipes
+            My Recipes
           </h3>
           {(user._id == loggedInUserID) ? (
             <Link to="/recipe/create" className="inline-flex items-center justify-center whitespace-nowrap text-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-slate-100 hover:text-accent-foreground h-9 rounded-md px-3 cursor-pointer mt-4 absolute top-0 right-4">
@@ -228,15 +265,95 @@ export default function UserProfile() {
     );
   };
 
+  // Gets recipes saved by user
+  const SavedRecipeList = () => {
+    const [recipes, setRecipes] = useState([]); // Store fetched recipes
+    const [error, setError] = useState(null);  // Store error message (if any)
+    const [loading, setLoading] = useState(true); // Store loading state
+  
+    // Function to fetch recipes
+    const fetchRecipes = async (ids) => {
+      try {
+        console.log(ids);
+        // Fetch all recipes concurrently and parse JSON responses
+        return await Promise.all(
+          ids.map((id) =>
+            fetch(`http://localhost:5050/recipe/${id}`).then((res) => {
+              if (!res.ok) throw new Error(`Failed to fetch recipe with ID: ${id}`);
+              return res.json();
+            })
+          )
+        );
+      } catch (error) {
+        console.error("Error fetching recipes:", error);
+        console.log(error);
+        throw error; // Rethrow to handle in calling code
+      }
+    };
+  
+    useEffect(() => {
+      // Fetch recipes when the component mounts
+      fetchRecipes(user.saved_recipe_ids)
+      .then((fetchedRecipes) => {  // Update state with fetched recipes
+        let filteredData = fetchedRecipes;
+        if (searchTerm != "") {
+          const parsedSearchTerms = parseSearchTerm(searchTerm);
+          filteredData = fetchedRecipes.filter(recipe => {
+            return parsedSearchTerms.every(term => {
+              // Convert ingredients and steps from strings to arrays
+              const ingredients = JSON.parse(recipe.ingredients || "[]");
+              const steps = JSON.parse(recipe.steps || "[]");
+              // Check if the term matches the title, desc, ingredients, or steps
+              return (
+                recipe.title?.toLowerCase().includes(term) ||
+                recipe.desc?.toLowerCase().includes(term) ||
+                ingredients.some(ingredient => ingredient.toLowerCase().includes(term)) ||
+                steps.some(step => step.toLowerCase().includes(term))
+              );
+            });
+          });
+          if (filteredData.length === 0) {
+            setRecipes("search failed");
+            setLoading(false);
+          } else {
+            setRecipes(filteredData);
+            setLoading(false);
+          }
+        } else {
+          setRecipes(fetchedRecipes); // Update state with fetched recipes
+          setLoading(false); // Update loading state
+        }
+      })         
+      .catch((err) => { // Update error state if fetch fails
+        setError(err.message)
+        setLoading(false)
+      }); 
+  }, [searchTerm]); // Runs each time searchTerm changes
+
+    // Render recipes or show error
+    return (
+      <div>
+        <div className="border rounded-lg overflow-hidden p-4 mt-4 relative">
+          <h3 className="text-lg font-semibold pb-2">
+            Saved Recipes
+          </h3>
+          <div>
+            {displaySavedRecipes(error, recipes, loading)}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // changed such that RecipeList only renders when profile is not being edited
   return (
     <div>
-      {!isEditing ? (profilePage(user, loggedInUserID, handleEditButtonClick, RecipeList)) : (profileEdit(user, handleFormSubmit, form, setIsEditing, updateForm, messageData))}
+      {!isEditing ? (profilePage(user, loggedInUserID, handleEditButtonClick, RecipeList, SavedRecipeList)) : (profileEdit(user, handleFormSubmit, form, setIsEditing, updateForm, messageData))}
     </div>
   );
 }
 
-function profilePage(user, loggedInUserID, handleEditButtonClick, RecipeList) {
+function profilePage(user, loggedInUserID, handleEditButtonClick, RecipeList, SavedRecipeList) {
   return (
     <div>
       <div className="border rounded-lg overflow-hidden p-4 relative">
@@ -280,6 +397,7 @@ function profilePage(user, loggedInUserID, handleEditButtonClick, RecipeList) {
         </div>
       </div>
       <RecipeList />
+      {(user._id == loggedInUserID) ? (<SavedRecipeList />) : ("")}
     </div>
   )
 }
@@ -424,20 +542,51 @@ function displayRecipes(error, recipes, loading) {
     return <p style={{ color: "red" }}>Error: {error}</p>;
   } else if (loading) {
     return <p>Loading recipes...</p>;
+  } else if (recipes === "search failed") {
+    return <p>No recipes found. Try searching something different!</p>;
   } else if (!recipes || recipes.length === 0) {
     return <p>No recipes found. Try creating a new one!</p>;
   }
   return (
-    // <div>
-    //   <ul>
-    //     {recipes.map((recipe, index) => (
-    //       <div>
-    //         <li key={index}>{recipe.title}</li>
-    //         <img src={'data:image/jpeg;base64,' + recipe.image} style={{ width: '300px', height: 'auto' }} />
-    //       </div>
-    //     ))}
-    //   </ul>
-    // </div>
+    <div className="p-4">
+      {/* Grid Container */}
+      <div className="grid md:grid-cols-3 gap-4 sm:grid-cols-2">
+        {/* Map over items */}
+        {recipes.map((recipe, index) => (
+          <Link
+            key={index}
+            to={`/recipe/${recipe._id}`}
+            className="bg-gray-50 rounded shadow-md text-center flex flex-col items-center justify-center p-4 transition-transform transform hover:scale-105 duration-300"
+          >
+            {/* Image */}
+            <div className="w-full h-40 flex items-center justify-center rounded">
+              <img src={'data:image/jpeg;base64,' + recipe.image} 
+                  className="max-w-full max-h-full object-contain rounded"
+                  alt={`Recipe: ${recipe.title}`}/>
+            </div>
+
+            <h3 className="text-lg font-semibold mt-2">
+              {recipe.title}
+            </h3>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Separate function to display recipes or error message
+function displaySavedRecipes(error, recipes, loading) {
+  if (error) {
+    return <p style={{ color: "red" }}>Error: {error}</p>;
+  } else if (loading) {
+    return <p>Loading recipes...</p>;
+  } else if (recipes === "search failed") {
+    return <p>No recipes found. Try searching something different!</p>;
+  } else if (!recipes || recipes.length === 0) {
+    return <p>No recipes found. Try creating a new one!</p>;
+  }
+  return (
     <div className="p-4">
       {/* Grid Container */}
       <div className="grid md:grid-cols-3 gap-4 sm:grid-cols-2">

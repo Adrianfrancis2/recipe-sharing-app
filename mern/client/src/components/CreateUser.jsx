@@ -42,6 +42,7 @@ export default function CreateUser() {
       username: form.username,
       password: form.password,
       recipe_ids: [],
+      saved_recipe_ids: [],
       views: 0,
     };
     try {
