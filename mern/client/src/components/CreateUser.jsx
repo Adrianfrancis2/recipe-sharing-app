@@ -94,7 +94,7 @@ export default function CreateUser() {
                 Account Information
             </h2>
             <p className="mt-1 text-sm leading-6 text-slate-600">
-              that is a made up name. what is your real name? 
+              Welcome to Cooked. Please create an account to get started.
             </p>
           </div>
 
