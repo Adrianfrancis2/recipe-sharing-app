@@ -59,6 +59,7 @@ router.post("/", async (req, res) => {
       username: req.body.username,
       password: hashedPassword,
       recipe_ids: [],
+      saved_recipe_ids: [],
       views: 0,
     };
     let collection = await db.collection("users");
@@ -119,16 +120,7 @@ router.patch("/:id", async (req, res) => {
   try {
     const query = { _id: new ObjectId(req.params.id) };
     const collection = await db.collection("users");
-
-    // const updates = {
-    //   $set: {
-    //     name: req.body.name,
-    //     username: req.body.username,
-    //     password: req.body.password,
-    //     recipe_ids: req.body.recipe_ids,
-    //     views: req.body.views,
-    //   },
-    // };
+    
     const findUserName = await collection.findOne(query);
     if (findUserName == null) {
       console.error("user not found");

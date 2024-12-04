@@ -16,6 +16,7 @@ function loggedInHomePage (displayRecipes) {
   const [recipes, setRecipes] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { searchTerm, parseSearchTerm } = useOutletContext();
 
   useEffect(() => {
     // get all recipes
@@ -27,15 +28,42 @@ function loggedInHomePage (displayRecipes) {
         return response.json();
       })
       .then(data => {
-        setRecipes(data);
-        setLoading(false);
-      })
+        let filteredData = data;
+        if (searchTerm != "") {
+          const parsedSearchTerms = parseSearchTerm(searchTerm);
+          filteredData = data.filter(recipe => {
+            return parsedSearchTerms.every(term => {
+              // Convert ingredients and steps from strings to arrays
+              const ingredients = JSON.parse(recipe.ingredients || "[]");
+              const steps = JSON.parse(recipe.steps || "[]");
+              // Check if the term matches the title, desc, ingredients, or steps
+              return (
+                recipe.title?.toLowerCase().includes(term) ||
+                recipe.desc?.toLowerCase().includes(term) ||
+                ingredients.some(ingredient => ingredient.toLowerCase().includes(term)) ||
+                steps.some(step => step.toLowerCase().includes(term))
+              );
+            });
+          });
+          if (filteredData.length === 0) {
+            setRecipes("search failed");
+            setLoading(false);
+          } else {
+            setRecipes(filteredData);
+            setLoading(false);
+          }
+        } else {
+          setRecipes(data);
+          setLoading(false);
+        }
+
+        })
       .catch(error => {
         console.error('Error fetching recipes:', error)
         setError(error.message);
         setLoading(false);
       });
-  }, []);
+  }, [searchTerm]);
 
   return (
     <div>
@@ -50,6 +78,8 @@ function displayRecipes(error, recipes, loading) {
     return <p style={{ color: "red" }}>Error: {error}</p>;
   } else if (loading) {
     return <p>Loading recipes...</p>;
+  } else if (recipes === "search failed") {
+    return <p>No recipes found. Try searching something different!</p>;
   } else if (!recipes || recipes.length === 0) {
     return <p>No recipes found. Try creating a new one!</p>;
   }
@@ -108,6 +138,8 @@ function guestHomePage () {
           alt="Chef Hat Image"
           className="w-40 h-50 mt-60 ml-20"  // Add styling as needed
           style={{
+            left: 'calc(60% + 50px)',
+            bottom: '70px',
             transform: 'rotate(20deg) translateX(190%) translateY(-130%)', // Slight tilt, change the degree for more tilt
           }}
         />
@@ -128,44 +160,47 @@ function guestHomePage () {
           className="w-40 h-50 mt-60 ml-17"  // Add styling as needed
           style={{
             position: 'absolute',
-            left: '-190px',
+            top: '10px',
+            left: 'calc(40% + 50px)',
             bottom: '-140px',
             transform: 'rotate(5deg) translateX(190%) translateY(-130%)',
           }}
         /> 
-        {/* <img 
-          src="HERE" // Replace with your image URL
-          alt="HERE Image"
+        <img 
+          src="https://cdn.icon-icons.com/icons2/1792/PNG/512/recipescookingbook_114713.png" // Replace with your image URL
+          alt="Cook Book Image"
           className="w-40 h-50 mt-60 ml-17"  // Add styling as needed
           style={{
             position: 'absolute',
-            left: '-190px',
-            bottom: '-140px',
-            transform: 'rotate(5deg) translateX(190%) translateY(-130%)',
+            top: '250px',
+            left: 'calc(15% + 50px)',
+            bottom: '-300px',
+            transform: 'rotate(5deg)',
           }}
         />
         <img
-          src="HERE" // Replace with your image URL
-          alt="HERE Image"
-          className="w-40 h-50 mt-60 ml-17"  // Add styling as needed
+          src="https://pixy.org/src/478/4786356.png" // Replace with your image URL
+          alt="Ingredients Image"
+          className="w-80 h-100 mt-60 ml-17"  // Add styling as needed
           style={{
             position: 'absolute',
-            left: '-190px',
+            top: '250px',
+            left: 'calc(-50% + 50px)',
             bottom: '-140px',
-            transform: 'rotate(5deg) translateX(190%) translateY(-130%)',
+            transform: 'translateX(190%) translateY(-130%)',
           }}
         />
         <img
-          src="HERE" // Replace with your image URL
-          alt="HERE Image"
+          src="https://pluspng.com/img-png/png-vegetables-and-fruits-black-and-white-pretty-local-fruit-vegetables-200.png" // Replace with your image URL
+          alt="Vegtables Image"
           className="w-40 h-50 mt-60 ml-17"  // Add styling as needed
           style={{
             position: 'absolute',
-            left: '-190px',
-            bottom: '-140px',
+            left: 'calc(25% + 50px)',
+            bottom: '-200px',
             transform: 'rotate(5deg) translateX(190%) translateY(-130%)',
           }}
-        /> */}
+        /> 
         {/* {loggedInUserID ? (LoggedInNavBar(loggedInUserID, logout)) : ""} */}
       </nav>
     </div>
