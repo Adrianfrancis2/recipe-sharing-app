@@ -120,6 +120,8 @@ router.patch("/:id", async (req, res) => {
   try {
     const query = { _id: new ObjectId(req.params.id) };
     const collection = await db.collection("users");
+    const saltRounds = 10;
+    const hashedNewPassword = await bcrypt.hash(req.body.new_password, saltRounds);
     
     const findUserName = await collection.findOne(query);
     if (findUserName == null) {
@@ -135,9 +137,11 @@ router.patch("/:id", async (req, res) => {
         // Dynamically add fields to the $set object
         for (const key in req.body) {
           if (key !== "password" && req.body[key] !== undefined) {
-            updates.$set[key] = req.body[key];
-          } else if (key == "new_password") {
-            updates.$set[password] = req.body[new_password];
+            if (key == "new_password") {
+              updates.$set.password = hashedNewPassword;
+            } else {
+              updates.$set[key] = req.body[key];
+            }
           }
         }
         const result = await collection.updateOne(query, updates);
