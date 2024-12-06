@@ -121,7 +121,11 @@ router.patch("/:id", async (req, res) => {
     const query = { _id: new ObjectId(req.params.id) };
     const collection = await db.collection("users");
     const saltRounds = 10;
-    const hashedNewPassword = await bcrypt.hash(req.body.new_password, saltRounds);
+    let hashedNewPassword = "";
+    if (req.body.new_password) {
+      hashedNewPassword = await bcrypt.hash(req.body.new_password, saltRounds);
+    }
+
     
     const findUserName = await collection.findOne(query);
     if (findUserName == null) {
