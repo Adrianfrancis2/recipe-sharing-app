@@ -283,7 +283,7 @@ function recipePage(recipe, recipeAuthor, loggedInUserID, user_obj, navigate, sa
             </div>
           </div>
           <h2 className="text-base font-semibold leading-7 text-slate-900 pt-4">
-            Directions:
+            Instructions:
           </h2>
           <div className="flex items-center space-x-1">
             <span className="list-decimal pl-4 space-y-2">

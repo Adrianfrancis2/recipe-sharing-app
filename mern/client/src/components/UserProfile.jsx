@@ -360,7 +360,7 @@ function profilePage(user, loggedInUserID, handleEditButtonClick, RecipeList, Sa
           <div className="col-span-1 grid grid-cols-1 gap-x-8 gap-y-2">
             <div className="flex items-center space-x-1">
               <h3 className="text-lg font-semibold pb-2">
-                {user.name}'s profile
+                {user.name}'s Profile
               </h3>
             </div>
             <div className="flex items-center space-x-1">
