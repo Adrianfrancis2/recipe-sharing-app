@@ -583,7 +583,7 @@ function displaySavedRecipes(error, recipes, loading) {
   } else if (recipes === "search failed") {
     return <p>No recipes found. Try searching something different!</p>;
   } else if (!recipes || recipes.length === 0) {
-    return <p>No recipes found. Try creating a new one!</p>;
+    return <p>No recipes found. Browse for more recipes to save!</p>;
   }
   return (
     <div className="p-4">
