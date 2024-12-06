@@ -53,27 +53,26 @@ export default function UserProfile() {
     }
 
     // check if username already exists (get request)
-    if (form.username.trim() != "") {
-      fetch("http://localhost:5050/user/usernames")
-      .then((response) => {
+    if (form.username.trim() !== "") {
+      try {
+        const response = await fetch("http://localhost:5050/user/usernames");
         if (!response.ok) {
           throw new Error("Failed to fetch usernames: " + response.statusText);
         }
-        return response.json();
-      })
-      .then((usernames) => {
+
+        const usernames = await response.json();
+  
         // Check if the username already exists
         const usernameExists = usernames.includes(form.username);
-
+  
         if (usernameExists) {
           setMessageData("username exists");
           return;
         }
-      })
-      .catch((error) => {
-        setMessageData("An error occurred while checking usernames. Please try again.");
+      } catch (error) {
         console.error("Error fetching usernames:", error);
-      });
+        return;
+      }
     }
 
     // check if password is valid
